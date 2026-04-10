@@ -6,7 +6,7 @@ import type {
   Point,
   ViewportState,
   OHLCBar,
-} from '@chart-lib/commons';
+} from '@tradecanvas/commons';
 import { xToBarIndex, yToPrice } from '../viewport/ScaleMapping.js';
 import type { UndoRedoManager } from '../features/UndoRedoManager.js';
 

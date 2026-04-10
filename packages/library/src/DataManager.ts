@@ -1,5 +1,5 @@
-import type { OHLCBar, DataSeries } from '@chart-lib/commons';
-import { mergeBar } from '@chart-lib/commons';
+import type { OHLCBar, DataSeries } from '@tradecanvas/commons';
+import { mergeBar } from '@tradecanvas/commons';
 
 /** Validate a single OHLC bar. Returns true if bar is usable. */
 function isValidBar(bar: OHLCBar): boolean {

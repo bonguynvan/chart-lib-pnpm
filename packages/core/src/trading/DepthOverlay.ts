@@ -1,4 +1,4 @@
-import type { DepthData, TradingConfig, ViewportState } from '@chart-lib/commons';
+import type { DepthData, TradingConfig, ViewportState } from '@tradecanvas/commons';
 import { priceToY } from '../viewport/ScaleMapping.js';
 
 export class DepthOverlay {

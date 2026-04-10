@@ -1,4 +1,4 @@
-import type { DrawingState, Point, ViewportState, DataSeries } from '@chart-lib/commons';
+import type { DrawingState, Point, ViewportState, DataSeries } from '@tradecanvas/commons';
 import { DrawingBase } from '../DrawingBase.js';
 import { barIndexToX, priceToY } from '../../viewport/ScaleMapping.js';
 

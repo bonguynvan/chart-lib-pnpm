@@ -6,7 +6,7 @@ import type {
   ConnectionState,
   OHLCBar,
   TimeFrame,
-} from '@chart-lib/commons';
+} from '@tradecanvas/commons';
 
 const TF_MAP: Record<string, string> = {
   '1s': '1s', '1m': '1m', '3m': '3m', '5m': '5m', '15m': '15m', '30m': '30m',

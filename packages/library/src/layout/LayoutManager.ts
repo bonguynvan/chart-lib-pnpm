@@ -1,5 +1,5 @@
-import type { PanelPosition, PanelConfig, ResolvedLayout, ResolvedPanel, DividerRect, Rect } from '@chart-lib/commons';
-import { DEFAULT_PANEL_HEIGHT, MIN_PANEL_HEIGHT, PRICE_AXIS_WIDTH, TIME_AXIS_HEIGHT } from '@chart-lib/commons';
+import type { PanelPosition, PanelConfig, ResolvedLayout, ResolvedPanel, DividerRect, Rect } from '@tradecanvas/commons';
+import { DEFAULT_PANEL_HEIGHT, MIN_PANEL_HEIGHT, PRICE_AXIS_WIDTH, TIME_AXIS_HEIGHT } from '@tradecanvas/commons';
 
 const DEFAULT_PANEL_WIDTH = 200;
 const MIN_PANEL_WIDTH = 80;

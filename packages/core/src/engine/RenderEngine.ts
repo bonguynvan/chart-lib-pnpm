@@ -1,7 +1,7 @@
-import { LayerType } from '@chart-lib/commons';
-import type { Size, ViewportState, Theme, DataSeries, Rect } from '@chart-lib/commons';
+import { LayerType } from '@tradecanvas/commons';
+import type { Size, ViewportState, Theme, DataSeries, Rect } from '@tradecanvas/commons';
 import { priceToY, yToPrice, xToBarIndex, barIndexToX } from '../viewport/ScaleMapping.js';
-import { PRICE_AXIS_WIDTH, computeTickStep, formatPrice } from '@chart-lib/commons';
+import { PRICE_AXIS_WIDTH, computeTickStep, formatPrice } from '@tradecanvas/commons';
 import { LayerManager } from './LayerManager.js';
 import { RenderLoop } from './RenderLoop.js';
 import { DPRManager } from './DPRManager.js';

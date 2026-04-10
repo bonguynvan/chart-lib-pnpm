@@ -1,5 +1,5 @@
-import type { ViewportState, Theme } from '@chart-lib/commons';
-import { computeTickStep } from '@chart-lib/commons';
+import type { ViewportState, Theme } from '@tradecanvas/commons';
+import { computeTickStep } from '@tradecanvas/commons';
 
 export class GridRenderer {
   private visible = true;

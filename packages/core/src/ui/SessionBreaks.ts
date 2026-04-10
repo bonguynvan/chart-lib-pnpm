@@ -1,4 +1,4 @@
-import type { ViewportState, Theme, DataSeries } from '@chart-lib/commons';
+import type { ViewportState, Theme, DataSeries } from '@tradecanvas/commons';
 import { barIndexToX } from '../viewport/ScaleMapping.js';
 
 export interface SessionBreakConfig {

@@ -1,4 +1,4 @@
-import type { OrderPlaceIntent, TradingConfig, Point } from '@chart-lib/commons';
+import type { OrderPlaceIntent, TradingConfig, Point } from '@tradecanvas/commons';
 
 export class TradingContextMenu {
   private menuElement: HTMLElement | null = null;

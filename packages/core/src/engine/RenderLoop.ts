@@ -1,4 +1,4 @@
-import { LayerType } from '@chart-lib/commons';
+import { LayerType } from '@tradecanvas/commons';
 
 export type RenderCallback = (dirtyLayers: ReadonlySet<LayerType>) => void;
 

@@ -6,8 +6,8 @@ import type {
   ConnectionState,
   OHLCBar,
   TimeFrame,
-} from '@chart-lib/commons';
-import { timeframeToMs } from '@chart-lib/commons';
+} from '@tradecanvas/commons';
+import { timeframeToMs } from '@tradecanvas/commons';
 
 export interface MockAdapterOptions {
   /** Base price to generate data around */

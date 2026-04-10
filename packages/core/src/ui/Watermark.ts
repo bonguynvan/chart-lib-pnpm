@@ -1,4 +1,4 @@
-import type { ViewportState, Theme, WatermarkConfig } from '@chart-lib/commons';
+import type { ViewportState, Theme, WatermarkConfig } from '@tradecanvas/commons';
 
 /**
  * Renders a centered watermark text on the chart background.

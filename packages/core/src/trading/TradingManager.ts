@@ -6,8 +6,8 @@ import type {
   ViewportState,
   Theme,
   Point,
-} from '@chart-lib/commons';
-import { DEFAULT_TRADING_CONFIG } from '@chart-lib/commons';
+} from '@tradecanvas/commons';
+import { DEFAULT_TRADING_CONFIG } from '@tradecanvas/commons';
 import { yToPrice } from '../viewport/ScaleMapping.js';
 import { OrderRenderer } from './OrderRenderer.js';
 import { PositionRenderer } from './PositionRenderer.js';

@@ -1,5 +1,5 @@
-import type { Theme, ThemeName } from '@chart-lib/commons';
-import { DARK_THEME, LIGHT_THEME } from '@chart-lib/commons';
+import type { Theme, ThemeName } from '@tradecanvas/commons';
+import { DARK_THEME, LIGHT_THEME } from '@tradecanvas/commons';
 
 export class ThemeManager {
   private theme: Theme;

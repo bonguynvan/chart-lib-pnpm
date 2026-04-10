@@ -1,4 +1,4 @@
-import type { ViewportState, Theme, DataSeries } from '@chart-lib/commons';
+import type { ViewportState, Theme, DataSeries } from '@tradecanvas/commons';
 
 // Reusable Date object — avoid allocation per bar
 const _date = new Date();

@@ -1,4 +1,4 @@
-// @chart-lib/core
+// @tradecanvas/core
 export * from './engine/index.js';
 export * from './viewport/index.js';
 export * from './charts/index.js';

@@ -1,4 +1,4 @@
-import type { DrawingState } from '@chart-lib/commons';
+import type { DrawingState } from '@tradecanvas/commons';
 
 export interface UndoableAction {
   type: 'drawingCreate' | 'drawingRemove' | 'drawingModify';

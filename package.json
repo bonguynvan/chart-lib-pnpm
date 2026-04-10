@@ -1,8 +1,9 @@
 {
-  "name": "chart-lib-monorepo",
+  "name": "tradecanvas-monorepo",
   "private": true,
   "version": "0.0.0",
   "description": "High-performance canvas trading chart library with built-in indicators, drawing tools, and real-time streaming. Zero runtime dependencies.",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
@@ -12,7 +13,8 @@
   },
   "devDependencies": {
     "typescript": "~5.9.3",
-    "vite": "^8.0.1"
+    "vite": "^8.0.1",
+    "vite-plugin-dts": "^4.5.4"
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {

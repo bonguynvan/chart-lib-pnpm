@@ -1,4 +1,4 @@
-import type { Point, ViewportState } from '@chart-lib/commons';
+import type { Point, ViewportState } from '@tradecanvas/commons';
 import type { PanHandler } from './PanHandler.js';
 import type { ZoomHandler } from './ZoomHandler.js';
 import type { CrosshairHandler } from './CrosshairHandler.js';

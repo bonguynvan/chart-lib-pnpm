@@ -1,4 +1,4 @@
-import type { DrawingState, Point, ViewportState } from '@chart-lib/commons';
+import type { DrawingState, Point, ViewportState } from '@tradecanvas/commons';
 import { DrawingBase } from '../DrawingBase.js';
 
 export class RayTool extends DrawingBase {

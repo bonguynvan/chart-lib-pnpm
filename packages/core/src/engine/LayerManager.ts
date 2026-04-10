@@ -1,5 +1,5 @@
-import type { Size } from '@chart-lib/commons';
-import { LayerType } from '@chart-lib/commons';
+import type { Size } from '@tradecanvas/commons';
+import { LayerType } from '@tradecanvas/commons';
 import { CanvasLayer } from './CanvasLayer.js';
 
 export class LayerManager {

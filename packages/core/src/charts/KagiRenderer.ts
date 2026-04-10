@@ -1,4 +1,4 @@
-import type { DataSeries, ViewportState, Theme } from '@chart-lib/commons';
+import type { DataSeries, ViewportState, Theme } from '@tradecanvas/commons';
 import type { ChartRendererInterface } from './ChartRenderer.js';
 
 /**

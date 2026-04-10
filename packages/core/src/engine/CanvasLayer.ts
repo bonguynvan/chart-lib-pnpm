@@ -1,4 +1,4 @@
-import type { Size } from '@chart-lib/commons';
+import type { Size } from '@tradecanvas/commons';
 
 export class CanvasLayer {
   readonly canvas: HTMLCanvasElement;

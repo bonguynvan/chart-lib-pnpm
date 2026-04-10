@@ -1,4 +1,4 @@
-import type { ChartEventType, ChartEvent, TauriBridgeOptions } from '@chart-lib/commons';
+import type { ChartEventType, ChartEvent, TauriBridgeOptions } from '@tradecanvas/commons';
 
 type Listener = (event: ChartEvent) => void;
 

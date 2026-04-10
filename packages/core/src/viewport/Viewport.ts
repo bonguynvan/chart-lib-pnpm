@@ -1,6 +1,6 @@
-import type { ViewportState, Rect, DataSeries } from '@chart-lib/commons';
-import { clamp, computePriceRange } from '@chart-lib/commons';
-import { DEFAULT_BAR_WIDTH, DEFAULT_BAR_SPACING, PRICE_AXIS_WIDTH, TIME_AXIS_HEIGHT } from '@chart-lib/commons';
+import type { ViewportState, Rect, DataSeries } from '@tradecanvas/commons';
+import { clamp, computePriceRange } from '@tradecanvas/commons';
+import { DEFAULT_BAR_WIDTH, DEFAULT_BAR_SPACING, PRICE_AXIS_WIDTH, TIME_AXIS_HEIGHT } from '@tradecanvas/commons';
 
 export class Viewport {
   private state: ViewportState;

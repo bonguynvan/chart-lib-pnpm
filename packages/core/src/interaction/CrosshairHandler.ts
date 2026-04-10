@@ -1,5 +1,5 @@
-import type { Point, ViewportState, Theme, DataSeries } from '@chart-lib/commons';
-import { formatPrice, PRICE_AXIS_WIDTH } from '@chart-lib/commons';
+import type { Point, ViewportState, Theme, DataSeries } from '@tradecanvas/commons';
+import { formatPrice, PRICE_AXIS_WIDTH } from '@tradecanvas/commons';
 import { xToBarIndex, yToPrice, barIndexToX } from '../viewport/ScaleMapping.js';
 
 export type CrosshairCallback = (barIndex: number | null, point: Point | null) => void;

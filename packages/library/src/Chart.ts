@@ -28,8 +28,8 @@ import type {
   ConnectionInfo,
   TimeFrame,
   FeaturesConfig,
-} from '@chart-lib/commons';
-import { LayerType, setLocale as setGlobalLocale, createVNTheme, computePriceLimits } from '@chart-lib/commons';
+} from '@tradecanvas/commons';
+import { LayerType, setLocale as setGlobalLocale, createVNTheme, computePriceLimits } from '@tradecanvas/commons';
 import {
   RenderEngine,
   Viewport,
@@ -80,8 +80,8 @@ import {
   SessionBreaks,
   CompareRenderer,
   CurrentPriceLine,
-} from '@chart-lib/core';
-import type { ChartRendererInterface } from '@chart-lib/core';
+} from '@tradecanvas/core';
+import type { ChartRendererInterface } from '@tradecanvas/core';
 import { DataManager } from './DataManager.js';
 import { ThemeManager } from './ThemeManager.js';
 import { LayoutManager } from './layout/LayoutManager.js';
@@ -105,8 +105,8 @@ export class Chart {
   private streamManager: StreamManager | null = null;
   private autoScrollOnNewBar = true;
   private displayDataCache: DataSeries | null = null;
-  private resolvedLayoutCache: import('@chart-lib/commons').ResolvedLayout | null = null;
-  private panelInfoCache: import('@chart-lib/core').PanelRenderInfo[] | null = null;
+  private resolvedLayoutCache: import('@tradecanvas/commons').ResolvedLayout | null = null;
+  private panelInfoCache: import('@tradecanvas/core').PanelRenderInfo[] | null = null;
   private renderScheduled = false;
   private containerSizeCache: { width: number; height: number } | null = null;
   private containerSizeCacheTime = 0;
@@ -136,7 +136,7 @@ export class Chart {
   private features: Required<FeaturesConfig>;
   private marketConfig: MarketConfig | null = null;
   private container: HTMLElement;
-  private currentPriceLine: import('@chart-lib/core').CurrentPriceLine;
+  private currentPriceLine: import('@tradecanvas/core').CurrentPriceLine;
 
   constructor(container: HTMLElement, options: ChartOptions) {
     this.container = container;
@@ -728,7 +728,7 @@ export class Chart {
    * Loads history, starts streaming, manages reconnection automatically.
    *
    * @example
-   * import { BinanceAdapter } from '@chart-lib/core';
+   * import { BinanceAdapter } from '@tradecanvas/core';
    * chart.connect({
    *   adapter: new BinanceAdapter(),
    *   symbol: 'BTCUSDT',
@@ -1020,7 +1020,7 @@ export class Chart {
 
   // --- Legend ---
 
-  setLegend(config: Partial<import('@chart-lib/core').LegendConfig>): void {
+  setLegend(config: Partial<import('@tradecanvas/core').LegendConfig>): void {
     this.chartLegend.setConfig(config);
     this.engine.requestRender(LayerType.UI);
   }
@@ -1049,7 +1049,7 @@ export class Chart {
 
   // --- Alerts ---
 
-  addAlert(price: number, condition: import('@chart-lib/core').AlertCondition = 'crossing', message?: string): string | null {
+  addAlert(price: number, condition: import('@tradecanvas/core').AlertCondition = 'crossing', message?: string): string | null {
     if (!this.features.alerts) return null;
     const id = this.alertManager.addAlert(price, condition, message);
     this.scheduleAutoSave();
@@ -1061,7 +1061,7 @@ export class Chart {
     this.scheduleAutoSave();
   }
 
-  getAlerts(): import('@chart-lib/core').PriceAlert[] {
+  getAlerts(): import('@tradecanvas/core').PriceAlert[] {
     return this.alertManager.getAlerts();
   }
 
@@ -1081,7 +1081,7 @@ export class Chart {
 
   // --- Replay ---
 
-  replay(config?: Partial<import('@chart-lib/core').ReplayConfig>): void {
+  replay(config?: Partial<import('@tradecanvas/core').ReplayConfig>): void {
     if (!this.features.replay) return;
     const data = this.dataManager.getData();
     this.replayManager.load(data);
@@ -1370,7 +1370,7 @@ export class Chart {
     return this.containerSizeCache;
   }
 
-  private buildPanelRenderInfos(): import('@chart-lib/core').PanelRenderInfo[] {
+  private buildPanelRenderInfos(): import('@tradecanvas/core').PanelRenderInfo[] {
     if (this.panelInfoCache) return this.panelInfoCache;
 
     const resolved = this.getResolvedLayout();

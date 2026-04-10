@@ -1,5 +1,5 @@
-import type { OHLCBar, TimeFrame, RawTick, AggregatedBar } from '@chart-lib/commons';
-import { timeframeToMs } from '@chart-lib/commons';
+import type { OHLCBar, TimeFrame, RawTick, AggregatedBar } from '@tradecanvas/commons';
+import { timeframeToMs } from '@tradecanvas/commons';
 import { Emitter } from './Emitter.js';
 
 interface AggregatorEvents {

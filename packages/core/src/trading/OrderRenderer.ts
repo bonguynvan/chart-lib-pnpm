@@ -1,6 +1,6 @@
-import type { TradingOrder, TradingConfig, ViewportState, Theme } from '@chart-lib/commons';
+import type { TradingOrder, TradingConfig, ViewportState, Theme } from '@tradecanvas/commons';
 import { priceToY } from '../viewport/ScaleMapping.js';
-import { PRICE_AXIS_WIDTH } from '@chart-lib/commons';
+import { PRICE_AXIS_WIDTH } from '@tradecanvas/commons';
 
 export interface DragState {
   orderId: string;

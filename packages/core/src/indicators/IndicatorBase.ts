@@ -7,7 +7,7 @@ import type {
   DataSeries,
   ViewportState,
   Point,
-} from '@chart-lib/commons';
+} from '@tradecanvas/commons';
 import { barIndexToX, priceToY } from '../viewport/ScaleMapping.js';
 
 export abstract class IndicatorBase implements IndicatorPlugin {

@@ -1,4 +1,4 @@
-import type { OHLCBar } from '@chart-lib/commons';
+import type { OHLCBar } from '@tradecanvas/commons';
 
 export class DataExporter {
   static toCSV(data: ReadonlyArray<OHLCBar>): string {

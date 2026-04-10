@@ -1,4 +1,4 @@
-import type { TradingOrder, TradingPosition, ViewportState, Point } from '@chart-lib/commons';
+import type { TradingOrder, TradingPosition, ViewportState, Point } from '@tradecanvas/commons';
 import { priceToY, yToPrice } from '../viewport/ScaleMapping.js';
 import type { DragState } from './OrderRenderer.js';
 

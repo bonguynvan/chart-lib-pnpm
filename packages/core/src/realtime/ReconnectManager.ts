@@ -1,5 +1,5 @@
-import type { ReconnectConfig } from '@chart-lib/commons';
-import { DEFAULT_RECONNECT } from '@chart-lib/commons';
+import type { ReconnectConfig } from '@tradecanvas/commons';
+import { DEFAULT_RECONNECT } from '@tradecanvas/commons';
 import { Emitter } from './Emitter.js';
 
 interface ReconnectEvents {

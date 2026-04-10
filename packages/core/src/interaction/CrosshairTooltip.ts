@@ -1,4 +1,4 @@
-import type { OHLCBar, Theme, Point } from '@chart-lib/commons';
+import type { OHLCBar, Theme, Point } from '@tradecanvas/commons';
 
 /**
  * High-performance floating tooltip.

@@ -1,7 +1,17 @@
 {
-  "name": "@chart-lib/library",
+  "name": "@tradecanvas/chart",
   "version": "0.1.0",
   "type": "module",
+  "description": "High-performance canvas trading chart with built-in indicators, drawing tools, and real-time streaming. Zero external dependencies.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthropics/tradecanvas",
+    "directory": "packages/library"
+  },
+  "sideEffects": false,
+  "keywords": ["trading", "chart", "canvas", "candlestick", "ohlc", "indicators", "drawing-tools", "technical-analysis", "financial-chart", "real-time", "typescript"],
+  "homepage": "https://github.com/anthropics/tradecanvas",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,7 +29,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@chart-lib/commons": "workspace:*",
-    "@chart-lib/core": "workspace:*"
+    "@tradecanvas/commons": "workspace:*",
+    "@tradecanvas/core": "workspace:*"
   }
 }

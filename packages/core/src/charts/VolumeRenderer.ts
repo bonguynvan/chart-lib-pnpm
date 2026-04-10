@@ -1,4 +1,4 @@
-import type { DataSeries, ViewportState, Theme } from '@chart-lib/commons';
+import type { DataSeries, ViewportState, Theme } from '@tradecanvas/commons';
 
 /**
  * Renders volume histogram bars at the bottom of the main chart area.

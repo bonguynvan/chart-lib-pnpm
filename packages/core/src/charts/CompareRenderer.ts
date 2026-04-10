@@ -1,4 +1,4 @@
-import type { DataSeries, ViewportState, Theme } from '@chart-lib/commons';
+import type { DataSeries, ViewportState, Theme } from '@tradecanvas/commons';
 import { barIndexToX, priceToY } from '../viewport/ScaleMapping.js';
 
 export interface CompareSymbol {

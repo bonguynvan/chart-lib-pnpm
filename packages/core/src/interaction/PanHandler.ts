@@ -1,4 +1,4 @@
-import type { Point } from '@chart-lib/commons';
+import type { Point } from '@tradecanvas/commons';
 
 export type PanCallback = (deltaX: number) => void;
 

@@ -6,7 +6,7 @@ import type {
   ResolvedIndicatorStyle,
   DataSeries,
   ViewportState,
-} from '@chart-lib/commons';
+} from '@tradecanvas/commons';
 
 interface IndicatorInstance {
   plugin: IndicatorPlugin;

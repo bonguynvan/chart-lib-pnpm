@@ -1,4 +1,4 @@
-import type { ViewportState } from '@chart-lib/commons';
+import type { ViewportState } from '@tradecanvas/commons';
 
 export function barIndexToX(index: number, viewport: ViewportState): number {
   const barUnit = viewport.barWidth + viewport.barSpacing;

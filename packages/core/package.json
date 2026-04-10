@@ -1,7 +1,16 @@
 {
-  "name": "@chart-lib/core",
+  "name": "@tradecanvas/core",
   "version": "0.1.0",
   "type": "module",
+  "description": "Canvas rendering engine for @tradecanvas/chart",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthropics/tradecanvas",
+    "directory": "packages/core"
+  },
+  "sideEffects": false,
+  "keywords": ["trading", "chart", "canvas", "types"],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,6 +28,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@chart-lib/commons": "workspace:*"
+    "@tradecanvas/commons": "workspace:*"
   }
 }

@@ -1,4 +1,4 @@
-import type { ViewportState, Theme, OHLCBar, DataSeries } from '@chart-lib/commons';
+import type { ViewportState, Theme, OHLCBar, DataSeries } from '@tradecanvas/commons';
 
 export interface LegendConfig {
   visible: boolean;

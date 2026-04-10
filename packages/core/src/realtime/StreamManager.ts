@@ -8,8 +8,8 @@ import type {
   RawTick,
   AggregatedBar,
   TimeFrame,
-} from '@chart-lib/commons';
-import { DEFAULT_STREAM_CONFIG, DEFAULT_RECONNECT } from '@chart-lib/commons';
+} from '@tradecanvas/commons';
+import { DEFAULT_STREAM_CONFIG, DEFAULT_RECONNECT } from '@tradecanvas/commons';
 import { Emitter } from './Emitter.js';
 import { TickAggregator } from './TickAggregator.js';
 import { ReconnectManager } from './ReconnectManager.js';

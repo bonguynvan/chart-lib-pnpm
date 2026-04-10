@@ -1,4 +1,4 @@
-import type { OHLCBar, DataSeries } from '@chart-lib/commons';
+import type { OHLCBar, DataSeries } from '@tradecanvas/commons';
 
 /**
  * Point & Figure chart.

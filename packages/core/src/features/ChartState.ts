@@ -1,4 +1,4 @@
-import type { ChartType, DrawingState, TradingOrder, TradingPosition, Theme } from '@chart-lib/commons';
+import type { ChartType, DrawingState, TradingOrder, TradingPosition, Theme } from '@tradecanvas/commons';
 import type { PriceAlert } from './AlertManager.js';
 
 /**

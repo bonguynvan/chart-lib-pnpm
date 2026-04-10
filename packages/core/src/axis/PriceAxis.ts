@@ -1,5 +1,5 @@
-import type { ViewportState, Theme } from '@chart-lib/commons';
-import { computeTickStep, formatPrice, PRICE_AXIS_WIDTH } from '@chart-lib/commons';
+import type { ViewportState, Theme } from '@tradecanvas/commons';
+import { computeTickStep, formatPrice, PRICE_AXIS_WIDTH } from '@tradecanvas/commons';
 
 export class PriceAxis {
   render(ctx: CanvasRenderingContext2D, viewport: ViewportState, theme: Theme): void {

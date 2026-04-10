@@ -1,6 +1,6 @@
-import type { ViewportState, Theme } from '@chart-lib/commons';
+import type { ViewportState, Theme } from '@tradecanvas/commons';
 import { priceToY } from '../viewport/ScaleMapping.js';
-import { PRICE_AXIS_WIDTH } from '@chart-lib/commons';
+import { PRICE_AXIS_WIDTH } from '@tradecanvas/commons';
 import { Emitter } from '../realtime/Emitter.js';
 
 export type AlertCondition = 'crossingUp' | 'crossingDown' | 'crossing' | 'greaterThan' | 'lessThan';

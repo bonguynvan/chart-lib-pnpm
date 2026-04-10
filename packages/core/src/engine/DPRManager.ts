@@ -1,4 +1,4 @@
-import type { Size } from '@chart-lib/commons';
+import type { Size } from '@tradecanvas/commons';
 
 export type ResizeCallback = (size: Size, dpr: number) => void;
 

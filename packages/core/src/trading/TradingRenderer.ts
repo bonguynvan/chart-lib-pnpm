@@ -1,4 +1,4 @@
-import type { ViewportState, Theme } from '@chart-lib/commons';
+import type { ViewportState, Theme } from '@tradecanvas/commons';
 import type { TradingManager } from './TradingManager.js';
 
 export class TradingRenderer {
