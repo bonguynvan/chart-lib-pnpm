@@ -108,17 +108,21 @@ export class Viewport {
     const barUnit = this.state.barWidth + this.state.barSpacing;
     const rightMarginPx = this.rightMarginBars * barUnit;
     const totalWidth = this.dataLength * barUnit;
-    const maxOffset = Math.max(0, totalWidth - this.state.chartRect.width + rightMarginPx);
-    // Consider "at end" if within 2 bar units of max
-    return this.state.offset >= maxOffset - barUnit * 2;
+    // Natural "scrolled to end" offset — may be negative when data is shorter
+    // than the viewport (right-aligned with empty space on the left).
+    const endOffset = totalWidth - this.state.chartRect.width + rightMarginPx;
+    return this.state.offset >= endOffset - barUnit * 2;
   }
 
   scrollToEnd(): void {
     const barUnit = this.state.barWidth + this.state.barSpacing;
     const rightMarginPx = this.rightMarginBars * barUnit;
     const totalWidth = this.dataLength * barUnit;
-    // Position last bar with rightMargin breathing room from the edge
-    this.state.offset = Math.max(0, totalWidth - this.state.chartRect.width + rightMarginPx);
+    // Position last bar with rightMargin breathing room from the right edge.
+    // For short data this offset is negative — that's intentional. It puts
+    // the bars on the right side of the viewport with empty space on the
+    // left, matching TradingView's behaviour for sparse charts.
+    this.state.offset = totalWidth - this.state.chartRect.width + rightMarginPx;
     this.updateVisibleRange();
   }
 
@@ -147,10 +151,29 @@ export class Viewport {
     const barUnit = this.state.barWidth + this.state.barSpacing;
     const totalWidth = this.dataLength * barUnit;
     const rightMarginPx = this.rightMarginBars * barUnit;
-    // Allow scrolling past the last bar by rightMarginBars
-    const maxOffset = Math.max(0, totalWidth - this.state.chartRect.width + rightMarginPx);
-    // Allow scrolling left to see some future space (half chart width)
-    const minOffset = Math.min(0, -(this.state.chartRect.width * 0.5));
+
+    // Natural "scrolled to end" offset — last bar `rightMarginPx` from the
+    // right edge of the chart area. Positive when data overflows the
+    // viewport, negative when data is shorter than the viewport.
+    const endOffset = totalWidth - this.state.chartRect.width + rightMarginPx;
+
+    let minOffset: number;
+    let maxOffset: number;
+
+    if (endOffset > 0) {
+      // Long data: user can pan left to history or scroll right to the end.
+      // Allow a half-viewport of "empty space on the left" past offset 0
+      // for breathing room when looking at the oldest bars.
+      minOffset = -(this.state.chartRect.width * 0.5);
+      maxOffset = endOffset;
+    } else {
+      // Short data: lock the viewport to the right-aligned position. There's
+      // nothing to scroll to — all bars fit, with empty space on the left.
+      // TradingView does this same lock for sparse charts.
+      minOffset = endOffset;
+      maxOffset = endOffset;
+    }
+
     this.state.offset = clamp(this.state.offset, minOffset, maxOffset);
   }
 
