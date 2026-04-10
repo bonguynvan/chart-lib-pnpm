@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradeCanvas — Basic Example</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      color: #e1e1e6;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      border-bottom: 1px solid #1e1e2e;
+    }
+    header h1 { font-size: 14px; font-weight: 600; }
+    .controls { display: flex; gap: 6px; }
+    .controls button {
+      padding: 6px 12px;
+      font-size: 11px;
+      border: 1px solid #2e2e3e;
+      border-radius: 4px;
+      background: transparent;
+      color: #a1a1aa;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .controls button:hover { background: #1e1e2e; color: #e1e1e6; }
+    .controls button.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+    select {
+      padding: 6px 8px;
+      font-size: 11px;
+      border: 1px solid #2e2e3e;
+      border-radius: 4px;
+      background: #0a0a0f;
+      color: #e1e1e6;
+      cursor: pointer;
+    }
+    #chart-container {
+      width: 100%;
+      height: calc(100vh - 50px);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TradeCanvas</h1>
+
+    <select id="symbol">
+      <option value="BTCUSDT">BTC/USDT</option>
+      <option value="ETHUSDT" selected>ETH/USDT</option>
+      <option value="SOLUSDT">SOL/USDT</option>
+      <option value="BNBUSDT">BNB/USDT</option>
+    </select>
+
+    <div class="controls" id="timeframes">
+      <button data-tf="1m">1m</button>
+      <button data-tf="5m" class="active">5m</button>
+      <button data-tf="15m">15m</button>
+      <button data-tf="1h">1H</button>
+      <button data-tf="4h">4H</button>
+      <button data-tf="1d">1D</button>
+    </div>
+
+    <div class="controls" id="indicators">
+      <button id="btn-sma">SMA</button>
+      <button id="btn-ema">EMA</button>
+      <button id="btn-bb">Bollinger</button>
+      <button id="btn-rsi">RSI</button>
+      <button id="btn-macd">MACD</button>
+      <button id="btn-vol">Volume Profile</button>
+    </div>
+
+    <div class="controls">
+      <button id="btn-theme">Toggle Theme</button>
+      <button id="btn-screenshot">Screenshot</button>
+    </div>
+  </header>
+
+  <div id="chart-container"></div>
+
+  <script type="module">
+    // When published: import from '@tradecanvas/chart'
+    // For local dev: import from the built library
+    import {
+      Chart,
+      BinanceAdapter,
+      DARK_THEME,
+      LIGHT_THEME,
+    } from '../../packages/library/src/index.ts'
+
+    // ─── Create chart ──────────────────────────────────────────────────
+    const container = document.getElementById('chart-container')
+    let isDark = true
+
+    const chart = new Chart(container, {
+      chartType: 'candlestick',
+      theme: DARK_THEME,
+      autoScale: true,
+      rightMargin: 5,
+      crosshair: { mode: 'magnet' },
+      watermark: { text: 'TradeCanvas', fontSize: 48, color: 'rgba(255,255,255,0.03)' },
+      features: {
+        drawings: true,
+        drawingMagnet: true,
+        drawingUndoRedo: true,
+        indicators: true,
+        trading: true,
+        volume: true,
+        legend: true,
+        crosshair: true,
+        keyboard: true,
+        screenshot: true,
+        alerts: true,
+        barCountdown: true,
+        logScale: true,
+        watermark: true,
+      },
+    })
+
+    // ─── Connect to Binance ────────────────────────────────────────────
+    let currentSymbol = 'ETHUSDT'
+    let currentTf = '5m'
+
+    async function connectStream() {
+      chart.disconnectStream()
+      const adapter = new BinanceAdapter()
+      await chart.connect({
+        adapter,
+        symbol: currentSymbol,
+        timeframe: currentTf,
+        historyLimit: 500,
+      })
+      chart.setWatermark(currentSymbol.replace('USDT', '/USDT'), {
+        fontSize: 48,
+        color: 'rgba(255,255,255,0.03)',
+      })
+    }
+    connectStream()
+
+    // ─── Symbol selector ───────────────────────────────────────────────
+    document.getElementById('symbol').addEventListener('change', (e) => {
+      currentSymbol = e.target.value
+      connectStream()
+    })
+
+    // ─── Timeframe buttons ─────────────────────────────────────────────
+    document.getElementById('timeframes').addEventListener('click', (e) => {
+      const btn = e.target.closest('button')
+      if (!btn) return
+      document.querySelectorAll('#timeframes button').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      currentTf = btn.dataset.tf
+      connectStream()
+    })
+
+    // ─── Indicator buttons ─────────────────────────────────────────────
+    const indicatorMap = {
+      'btn-sma': 'sma',
+      'btn-ema': 'ema',
+      'btn-bb': 'bollinger',
+      'btn-rsi': 'rsi',
+      'btn-macd': 'macd',
+      'btn-vol': 'volume-profile',
+    }
+    const activeIndicators = new Map() // id → instanceId
+
+    Object.entries(indicatorMap).forEach(([btnId, indicatorId]) => {
+      document.getElementById(btnId).addEventListener('click', (e) => {
+        const btn = e.target
+        if (activeIndicators.has(indicatorId)) {
+          chart.removeIndicator(activeIndicators.get(indicatorId))
+          activeIndicators.delete(indicatorId)
+          btn.classList.remove('active')
+        } else {
+          const instanceId = chart.addIndicator(indicatorId)
+          if (instanceId) {
+            activeIndicators.set(indicatorId, instanceId)
+            btn.classList.add('active')
+          }
+        }
+      })
+    })
+
+    // ─── Theme toggle ──────────────────────────────────────────────────
+    document.getElementById('btn-theme').addEventListener('click', () => {
+      isDark = !isDark
+      chart.setTheme(isDark ? DARK_THEME : LIGHT_THEME)
+      document.body.style.background = isDark ? '#0a0a0f' : '#ffffff'
+      document.body.style.color = isDark ? '#e1e1e6' : '#1a1a2e'
+    })
+
+    // ─── Screenshot ────────────────────────────────────────────────────
+    document.getElementById('btn-screenshot').addEventListener('click', () => {
+      chart.screenshot()
+    })
+  </script>
+</body>
+</html>
