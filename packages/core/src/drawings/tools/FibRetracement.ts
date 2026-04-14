@@ -9,8 +9,6 @@ export class FibRetracementTool extends DrawingBase {
 
   render(ctx: CanvasRenderingContext2D, state: DrawingState, viewport: ViewportState, selected: boolean): void {
     if (state.anchors.length < 2) return;
-    const p1 = this.anchorToPixel(state.anchors[0], viewport);
-    const p2 = this.anchorToPixel(state.anchors[1], viewport);
     const { chartRect } = viewport;
     const priceHigh = state.anchors[0].price;
     const priceLow = state.anchors[1].price;
@@ -58,8 +56,6 @@ export class FibRetracementTool extends DrawingBase {
 
   hitTest(point: Point, state: DrawingState, viewport: ViewportState, tolerance: number): boolean {
     if (state.anchors.length < 2) return false;
-    const p1 = this.anchorToPixel(state.anchors[0], viewport);
-    const p2 = this.anchorToPixel(state.anchors[1], viewport);
     const { chartRect } = viewport;
     if (point.x < chartRect.x - tolerance || point.x > chartRect.x + chartRect.width + tolerance) return false;
     const priceHigh = state.anchors[0].price;

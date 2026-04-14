@@ -22,7 +22,6 @@ export class MeasureTool extends DrawingBase {
     const priceDiff = state.anchors[1].price - state.anchors[0].price;
     const barsDiff = Math.abs(state.anchors[1].time - state.anchors[0].time);
     const pctChange = state.anchors[0].price !== 0 ? (priceDiff / state.anchors[0].price * 100) : 0;
-    const pixelDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
 
     const lines = [
       `Price: ${priceDiff >= 0 ? '+' : ''}${priceDiff.toFixed(2)} (${pctChange >= 0 ? '+' : ''}${pctChange.toFixed(2)}%)`,

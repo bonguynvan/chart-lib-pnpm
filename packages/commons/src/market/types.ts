@@ -1,5 +1,3 @@
-import type { Theme } from '../types/theme.js';
-
 export type MarketType = 'crypto' | 'stock' | 'forex';
 
 export type StockExchange = 'HOSE' | 'HNX' | 'UPCOM' | 'NYSE' | 'NASDAQ' | string;

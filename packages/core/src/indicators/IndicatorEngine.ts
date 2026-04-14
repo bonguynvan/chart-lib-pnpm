@@ -41,7 +41,7 @@ export class IndicatorEngine {
     const config: IndicatorConfig = {
       id,
       instanceId,
-      params: { ...plugin.descriptor.defaultConfig, ...params },
+      params: { ...plugin.descriptor.defaultConfig, ...params } as Record<string, number | string | boolean>,
       visible: true,
     };
 

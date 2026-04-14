@@ -6,8 +6,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/tradecanvas",
+    "url": "https://github.com/bonguynvan/chart-lib-pnpm.git",
     "directory": "packages/commons"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "sideEffects": false,
   "keywords": ["trading", "chart", "canvas", "types"],
@@ -25,6 +28,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm build"
   }
 }

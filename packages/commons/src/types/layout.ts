@@ -1,4 +1,4 @@
-import type { Rect, ViewportState } from './rendering.js';
+import type { Rect } from './rendering.js';
 
 export type PanelPosition = 'top' | 'bottom' | 'left' | 'right';
 

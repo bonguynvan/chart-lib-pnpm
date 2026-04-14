@@ -29,7 +29,6 @@ export class ChartLegend {
   private config: LegendConfig = { ...DEFAULT_LEGEND_CONFIG };
   private symbol = '';
   private timeframe = '';
-  private chartType = '';
   private hoverBar: OHLCBar | null = null;
   private indicators: { name: string; color: string; value: string }[] = [];
 
@@ -45,8 +44,8 @@ export class ChartLegend {
     this.timeframe = tf;
   }
 
-  setChartType(type: string): void {
-    this.chartType = type;
+  setChartType(_type: string): void {
+    // reserved for future use
   }
 
   setHoverBar(bar: OHLCBar | null): void {

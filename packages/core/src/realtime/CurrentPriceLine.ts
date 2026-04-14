@@ -10,7 +10,6 @@ export class CurrentPriceLine {
   private price: number | null = null;
   private previousClose: number | null = null;
   private visible = true;
-  private animated = true;
   private flashUntil = 0;
   private pricePrecision = 2;
 

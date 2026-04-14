@@ -49,8 +49,7 @@ export class VolumeProfileIndicator extends IndicatorBase {
     const meta = output.meta as { minPrice: number; maxPrice: number; rows: number; rowHeight: number; bins: number[]; maxVolume: number } | undefined;
     if (!meta || meta.maxVolume === 0) return;
 
-    const { minPrice, maxPrice, rows, rowHeight, bins, maxVolume } = meta;
-    const priceRange = maxPrice - minPrice || 1;
+    const { minPrice, rows, rowHeight, bins, maxVolume } = meta;
     const barHeight = chartRect.height / rows;
     const maxBarWidth = chartRect.width * 0.3;
 

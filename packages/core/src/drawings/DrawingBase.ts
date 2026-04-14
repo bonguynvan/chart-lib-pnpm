@@ -6,7 +6,6 @@ import type {
   Point,
   ViewportState,
   AnchorPoint,
-  DataSeries,
 } from '@tradecanvas/commons';
 import { barIndexToX, priceToY, xToBarIndex, yToPrice } from '../viewport/ScaleMapping.js';
 

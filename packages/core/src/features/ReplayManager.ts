@@ -11,6 +11,7 @@ interface ReplayEvents {
   bar: { bar: OHLCBar; index: number; total: number };
   complete: void;
   stateChange: 'playing' | 'paused' | 'stopped';
+  [key: string]: unknown;
 }
 
 /**

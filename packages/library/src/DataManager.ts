@@ -22,7 +22,7 @@ function sanitizeBar(bar: OHLCBar): OHLCBar {
     ...bar,
     high: Math.max(bar.open, bar.high, bar.low, bar.close),
     low: Math.min(bar.open, bar.high, bar.low, bar.close),
-    volume: bar.volume !== undefined ? Math.max(0, bar.volume) : undefined,
+    volume: bar.volume !== undefined ? Math.max(0, bar.volume) : 0,
   };
 }
 

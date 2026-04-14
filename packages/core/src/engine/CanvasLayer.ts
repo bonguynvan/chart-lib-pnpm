@@ -6,8 +6,8 @@ export class CanvasLayer {
   private dpr = 1;
 
   constructor(
-    private container: HTMLElement,
-    private zIndex: number,
+    container: HTMLElement,
+    zIndex: number,
   ) {
     this.canvas = document.createElement('canvas');
     this.canvas.style.position = 'absolute';

@@ -1,6 +1,5 @@
 import type { ViewportState, Theme } from '@tradecanvas/commons';
 import { priceToY } from '../viewport/ScaleMapping.js';
-import { PRICE_AXIS_WIDTH } from '@tradecanvas/commons';
 import { Emitter } from '../realtime/Emitter.js';
 
 export type AlertCondition = 'crossingUp' | 'crossingDown' | 'crossing' | 'greaterThan' | 'lessThan';
@@ -18,6 +17,7 @@ interface AlertEvents {
   triggered: PriceAlert;
   added: PriceAlert;
   removed: string;
+  [key: string]: unknown;
 }
 
 let alertId = 1;

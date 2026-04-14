@@ -6,12 +6,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/tradecanvas",
+    "url": "https://github.com/bonguynvan/chart-lib-pnpm.git",
     "directory": "packages/library"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "sideEffects": false,
   "keywords": ["trading", "chart", "canvas", "candlestick", "ohlc", "indicators", "drawing-tools", "technical-analysis", "financial-chart", "real-time", "typescript"],
-  "homepage": "https://github.com/anthropics/tradecanvas",
+  "homepage": "https://github.com/bonguynvan/chart-lib-pnpm",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -26,7 +29,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@tradecanvas/commons": "workspace:*",

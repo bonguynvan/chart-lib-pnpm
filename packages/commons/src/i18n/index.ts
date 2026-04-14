@@ -2,7 +2,7 @@ export type { Locale, LocaleStrings, NumberFormatConfig, DateFormatConfig } from
 export { en } from './en.js';
 export { vi } from './vi.js';
 
-import type { Locale, LocaleStrings, NumberFormatConfig } from './types.js';
+import type { Locale, LocaleStrings } from './types.js';
 import { en } from './en.js';
 import { vi } from './vi.js';
 
@@ -62,7 +62,6 @@ export function formatVND(value: number): string {
 }
 
 export function formatVolumeLoc(value: number, locale?: string): string {
-  const strings = locales.get(locale ?? currentLocale) ?? en;
   if (value >= 1e9) return formatNumber(value / 1e9, 2, locale ?? currentLocale) + 'B';
   if (value >= 1e6) return formatNumber(value / 1e6, 2, locale ?? currentLocale) + 'M';
   if (value >= 1e3) return formatNumber(value / 1e3, 2, locale ?? currentLocale) + 'K';

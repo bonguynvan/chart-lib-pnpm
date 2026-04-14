@@ -5,6 +5,7 @@ import { Emitter } from './Emitter.js';
 interface AggregatorEvents {
   bar: AggregatedBar;       // bar updated (forming)
   barClose: AggregatedBar;  // bar closed (finalized)
+  [key: string]: unknown;
 }
 
 /**
@@ -30,17 +31,16 @@ export class TickAggregator extends Emitter<AggregatorEvents> {
   private readonly ringCapacity: number;
 
   constructor(
-    private timeframe: TimeFrame,
+    _timeframe: TimeFrame,
     bufferSize = 1000,
   ) {
     super();
-    this.timeframeMs = timeframeToMs(timeframe);
+    this.timeframeMs = timeframeToMs(_timeframe);
     this.ringCapacity = bufferSize;
     this.tickRing = new Array<RawTick>(bufferSize);
   }
 
   setTimeframe(tf: TimeFrame): void {
-    this.timeframe = tf;
     this.timeframeMs = timeframeToMs(tf);
     this.currentBar = null;
     this.ringHead = 0;

@@ -3,7 +3,6 @@ import type {
   ConnectionState,
   ConnectionInfo,
   DataAdapter,
-  DataAdapterEventType,
   OHLCBar,
   RawTick,
   AggregatedBar,
@@ -30,6 +29,7 @@ export interface StreamEvents {
   connectionChange: ConnectionInfo;
   /** Error occurred */
   error: { message: string; code?: string };
+  [key: string]: unknown;
 }
 
 /**
@@ -198,7 +198,7 @@ export class StreamManager extends Emitter<StreamEvents> {
   }
 
   private wireReconnector(): void {
-    this.reconnector.on('attempt', ({ attempt, delay }) => {
+    this.reconnector.on('attempt', ({ attempt, delay: _delay }) => {
       this.setState('reconnecting');
       this.emit('connectionChange', {
         state: 'reconnecting',

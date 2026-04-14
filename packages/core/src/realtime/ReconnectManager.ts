@@ -6,6 +6,7 @@ interface ReconnectEvents {
   attempt: { attempt: number; delay: number };
   success: void;
   giveUp: { attempts: number };
+  [key: string]: unknown;
 }
 
 /**

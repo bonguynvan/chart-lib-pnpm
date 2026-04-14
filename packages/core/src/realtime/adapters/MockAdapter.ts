@@ -140,7 +140,6 @@ export class MockAdapter implements DataAdapter {
       };
 
       // Check if bar closed (crossed timeframe boundary)
-      const prevBarTime = barTime - intervalMs;
       const closed = false; // In mock, we mostly send forming bars
 
       this.emitEvent('bar', { bar, closed });

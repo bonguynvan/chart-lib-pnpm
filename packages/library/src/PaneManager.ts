@@ -1,5 +1,5 @@
 import type { ViewportState, Rect } from '@tradecanvas/commons';
-import { DEFAULT_PANEL_HEIGHT, MIN_PANEL_HEIGHT, PRICE_AXIS_WIDTH, TIME_AXIS_HEIGHT } from '@tradecanvas/commons';
+import { DEFAULT_PANEL_HEIGHT, PRICE_AXIS_WIDTH, TIME_AXIS_HEIGHT } from '@tradecanvas/commons';
 
 export interface PaneInfo {
   instanceId: string;

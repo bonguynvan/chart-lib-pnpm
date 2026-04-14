@@ -23,13 +23,12 @@ import type {
   MarketConfig,
   Locale,
   StreamConfig,
-  DataAdapter,
   ConnectionState,
   ConnectionInfo,
   TimeFrame,
   FeaturesConfig,
 } from '@tradecanvas/commons';
-import { LayerType, setLocale as setGlobalLocale, createVNTheme, computePriceLimits } from '@tradecanvas/commons';
+import { LayerType, setLocale as setGlobalLocale, computePriceLimits } from '@tradecanvas/commons';
 import {
   RenderEngine,
   Viewport,
@@ -63,7 +62,6 @@ import {
   ChartStateManager,
   UndoRedoManager,
   Animator,
-  Easing,
   KeyboardHandler,
   CrosshairTooltip,
   HollowCandleRenderer,
@@ -124,7 +122,6 @@ export class Chart {
   private autoSaveDelay = 0; // 0 = disabled
   private autoSaveKey: string | null = null;
   private animator: Animator;
-  private keyboardHandler: KeyboardHandler;
   private crosshairTooltip: CrosshairTooltip;
   private interactionManager: InteractionManager;
   private crosshairHandler: CrosshairHandler;
@@ -167,6 +164,13 @@ export class Chart {
       screenshot: f.screenshot ?? true,
       alerts: f.alerts ?? true,
       replay: f.replay ?? true,
+      sessionBreaks: f.sessionBreaks ?? true,
+      barCountdown: f.barCountdown ?? true,
+      compareSymbols: f.compareSymbols ?? true,
+      dataExport: f.dataExport ?? true,
+      logScale: f.logScale ?? true,
+      timeframes: f.timeframes ?? [],
+      defaultTimeframeFavorites: f.defaultTimeframeFavorites ?? [],
     };
 
     container.style.position = 'relative';
@@ -319,7 +323,7 @@ export class Chart {
     this.crosshairTooltip.create(container);
 
     // Keyboard navigation
-    this.keyboardHandler = new KeyboardHandler({
+    void new KeyboardHandler({
       scrollBars: (count) => {
         const barUnit = this.viewport.getState().barWidth + this.viewport.getState().barSpacing;
         this.viewport.scrollBy(count * barUnit);
@@ -1085,7 +1089,7 @@ export class Chart {
     if (!this.features.replay) return;
     const data = this.dataManager.getData();
     this.replayManager.load(data);
-    this.replayManager.on('bar', ({ bar, index }) => {
+    this.replayManager.on('bar', ({ bar: _bar, index }) => {
       const slice = data.slice(0, index + 1);
       this.dataManager.setData(slice);
       this.crosshairHandler.setData(slice);
