@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradeCanvas — High-Performance Canvas Trading Chart</title>
+  <meta name="description" content="High-performance canvas trading chart with 20+ indicators, 23 drawing tools, real-time streaming, and zero dependencies." />
+  <style>
+    /* ── Reset ───────────────────────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-elevated: #111118;
+      --bg-card: rgba(17, 17, 24, 0.7);
+      --border: #1e1e2e;
+      --border-subtle: #16161f;
+      --text: #e1e1e6;
+      --text-muted: #6b6b7b;
+      --text-dim: #a1a1aa;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.15);
+      --green: #10b981;
+      --red: #ef4444;
+      --radius: 6px;
+      --radius-lg: 12px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      --transition: 150ms ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 64px 24px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 0%, #a0a0b0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-dim);
+      max-width: 540px;
+      margin: 0 auto 32px;
+      font-weight: 400;
+    }
+
+    /* ── CTA Buttons ────────────────────────────────────────────────── */
+    .cta-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .cta-install {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .cta-install:hover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.06);
+    }
+
+    .cta-install .copy-icon {
+      opacity: 0.4;
+      transition: opacity var(--transition);
+      font-size: 12px;
+    }
+
+    .cta-install:hover .copy-icon { opacity: 0.8; }
+
+    .cta-install.copied {
+      border-color: var(--green);
+    }
+
+    .cta-install.copied .copy-icon { opacity: 1; color: var(--green); }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+
+    .cta-btn--primary {
+      background: var(--accent);
+      color: white;
+      border: 1px solid var(--accent);
+    }
+
+    .cta-btn--primary:hover { background: #2563eb; }
+
+    .cta-btn--ghost {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+
+    .cta-btn--ghost:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    /* ── Badges ──────────────────────────────────────────────────────── */
+    .badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .badge-dot--green { background: var(--green); }
+    .badge-dot--red { background: var(--red); }
+
+    /* ── Chart Section ───────────────────────────────────────────────── */
+    .chart-section {
+      padding: 0 24px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .chart-wrapper {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .chart-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: var(--bg-elevated);
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 8px;
+    }
+
+    .toolbar-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .tb {
+      padding: 5px 10px;
+      font-size: 12px;
+      font-family: var(--font);
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .tb:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .tb.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .tb-select {
+      padding: 5px 8px;
+      font-size: 12px;
+      font-family: var(--font);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b6b7b' stroke-width='1.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 24px;
+    }
+
+    .tb-select:hover { border-color: var(--text-muted); }
+
+    #chart-container {
+      width: 100%;
+      height: 65vh;
+      min-height: 450px;
+    }
+
+    /* ── Status Bar ──────────────────────────────────────────────────── */
+    .chart-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-elevated);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: background 0.3s;
+    }
+
+    .status-dot.connected { background: var(--green); }
+    .status-dot.error { background: var(--red); }
+
+    /* ── Feature Cards ───────────────────────────────────────────────── */
+    .features-section {
+      padding: 64px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 15px;
+      margin-bottom: 48px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      padding: 28px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: border-color var(--transition), transform 200ms ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--text-muted);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 16px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .feature-icon--green {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ── Quick Start ─────────────────────────────────────────────────── */
+    .quickstart-section {
+      padding: 64px 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .code-block {
+      position: relative;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .code-copy-btn {
+      padding: 4px 10px;
+      font-size: 11px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .code-copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .code-body {
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .code-body pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    .code-body .kw { color: #c084fc; }
+    .code-body .fn { color: #60a5fa; }
+    .code-body .str { color: #34d399; }
+    .code-body .cmt { color: #4a4a5a; }
+    .code-body .obj { color: #f9a8d4; }
+    .code-body .bool { color: #fb923c; }
+
+    /* ── Footer ──────────────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .footer a:hover { color: var(--accent); }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .footer-sep { color: var(--border); }
+
+    /* ── Light Theme ─────────────────────────────────────────────────── */
+    body.light {
+      --bg: #fafafa;
+      --bg-elevated: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.8);
+      --border: #e2e2ea;
+      --border-subtle: #ececf0;
+      --text: #1a1a2e;
+      --text-muted: #8888a0;
+      --text-dim: #555566;
+      --accent-glow: rgba(59, 130, 246, 0.08);
+    }
+
+    body.light .hero-title {
+      background: linear-gradient(135deg, #1a1a2e 0%, #444460 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    body.light .code-body pre { color: #444466; }
+    body.light .code-body .kw { color: #7c3aed; }
+    body.light .code-body .fn { color: #2563eb; }
+    body.light .code-body .str { color: #059669; }
+    body.light .code-body .cmt { color: #9ca3af; }
+
+    /* ── Responsive ──────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero { padding: 40px 16px 24px; }
+      .chart-section { padding: 0 12px 32px; }
+      .chart-toolbar { padding: 8px 10px; gap: 6px; }
+      .toolbar-divider { display: none; }
+      #chart-container { height: 50vh; min-height: 350px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .badge-row { gap: 16px; }
+    }
+  </style>
+  <script type="module" crossorigin src="/tradecanvas/assets/index-D6ryDA7O.js"></script>
+</head>
+<body>
+
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <h1 class="hero-title">TradeCanvas</h1>
+    <p class="hero-subtitle">High-performance canvas trading chart. Zero dependencies.</p>
+
+    <div class="cta-row">
+      <button class="cta-install" id="install-btn" title="Copy to clipboard">
+        <span>npm install @tradecanvas/chart</span>
+        <span class="copy-icon">COPY</span>
+      </button>
+      <a href="https://github.com/bonguynvan/tradecanvas" class="cta-btn cta-btn--primary" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.npmjs.com/package/@tradecanvas/chart" class="cta-btn cta-btn--ghost" target="_blank" rel="noopener">npm</a>
+    </div>
+
+    <div class="badge-row">
+      <span class="badge"><span class="badge-dot"></span> 20+ Indicators</span>
+      <span class="badge"><span class="badge-dot badge-dot--green"></span> 23 Drawing Tools</span>
+      <span class="badge"><span class="badge-dot badge-dot--red"></span> Real-Time Streaming</span>
+      <span class="badge"><span class="badge-dot"></span> Zero Dependencies</span>
+    </div>
+  </section>
+
+  <!-- ── Chart ─────────────────────────────────────────────────────── -->
+  <section class="chart-section">
+    <div class="chart-wrapper">
+      <div class="chart-toolbar">
+        <!-- Symbol -->
+        <div class="toolbar-group">
+          <select class="tb-select" id="symbol">
+            <option value="BTCUSDT" selected>BTC / USDT</option>
+            <option value="ETHUSDT">ETH / USDT</option>
+            <option value="SOLUSDT">SOL / USDT</option>
+            <option value="BNBUSDT">BNB / USDT</option>
+          </select>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Timeframe -->
+        <div class="toolbar-group" id="timeframes">
+          <button class="tb" data-tf="1m">1m</button>
+          <button class="tb active" data-tf="5m">5m</button>
+          <button class="tb" data-tf="15m">15m</button>
+          <button class="tb" data-tf="1h">1H</button>
+          <button class="tb" data-tf="4h">4H</button>
+          <button class="tb" data-tf="1d">1D</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Chart Type -->
+        <div class="toolbar-group">
+          <span class="toolbar-label">Type</span>
+          <select class="tb-select" id="chart-type">
+            <option value="candlestick">Candlestick</option>
+            <option value="line">Line</option>
+            <option value="area">Area</option>
+            <option value="hollow-candle">Hollow Candle</option>
+            <option value="heikin-ashi">Heikin-Ashi</option>
+          </select>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Indicators -->
+        <div class="toolbar-group" id="indicators">
+          <span class="toolbar-label">Indicators</span>
+          <button class="tb" data-ind="sma">SMA</button>
+          <button class="tb" data-ind="ema">EMA</button>
+          <button class="tb" data-ind="bollinger">BB</button>
+          <button class="tb" data-ind="rsi">RSI</button>
+          <button class="tb" data-ind="macd">MACD</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Drawing Tools -->
+        <div class="toolbar-group" id="drawings">
+          <span class="toolbar-label">Draw</span>
+          <button class="tb" data-draw="trendline">Trendline</button>
+          <button class="tb" data-draw="horizontal-line">H-Line</button>
+          <button class="tb" data-draw="fibonacci-retracement">Fib</button>
+          <button class="tb" data-draw="rectangle">Rect</button>
+          <button class="tb" data-draw="measure">Measure</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Actions -->
+        <div class="toolbar-group">
+          <button class="tb" id="btn-theme" title="Toggle theme">Theme</button>
+          <button class="tb" id="btn-screenshot" title="Save screenshot">Screenshot</button>
+        </div>
+      </div>
+
+      <div id="chart-container"></div>
+
+      <div class="chart-status">
+        <div class="status-indicator">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">Connecting...</span>
+        </div>
+        <span id="status-symbol">BTCUSDT 5m</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Features ──────────────────────────────────────────────────── -->
+  <section class="features-section">
+    <h2 class="section-title">Built for Trading</h2>
+    <p class="section-subtitle">Everything you need for a professional trading chart, in a single package.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">/\</div>
+        <h3>20+ Technical Indicators</h3>
+        <p>SMA, EMA, RSI, MACD, Bollinger Bands, Ichimoku, Stochastic, ATR, and more. All computed internally with no external math libraries.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon feature-icon--green">//</div>
+        <h3>23 Drawing Tools</h3>
+        <p>Trendlines, Fibonacci, channels, Elliott waves, Gann tools. Click-to-place with magnet snapping, undo/redo, and full serialization.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">$</div>
+        <h3>Trading Overlay</h3>
+        <p>Render positions, orders, SL/TP markers directly on the chart. Drag to modify. Exactly like MT4/MT5 but in the browser.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon feature-icon--green">~</div>
+        <h3>Real-Time Streaming</h3>
+        <p>Built-in Binance WebSocket adapter. Or plug in your own data source with the simple adapter interface. Auto-reconnect included.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">{ }</div>
+        <h3>Save and Load State</h3>
+        <p>Persist everything to JSON: drawings, indicators, theme, chart type. Restore a full chart state with a single call.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon feature-icon--green">&gt;</div>
+        <h3>Replay Mode</h3>
+        <p>Step through historical bars one at a time for backtesting visualization. Control playback speed and jump to any point in time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Quick Start ─────────────────────────────────────────────────── -->
+  <section class="quickstart-section">
+    <h2 class="section-title">Quick Start</h2>
+    <p class="section-subtitle">A full-featured trading chart with live data in 15 lines.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span>main.ts</span>
+        <button class="code-copy-btn" id="copy-code">Copy</button>
+      </div>
+      <div class="code-body">
+        <pre><span class="kw">import</span> { <span class="obj">Chart</span>, <span class="obj">BinanceAdapter</span> } <span class="kw">from</span> <span class="str">'@tradecanvas/chart'</span>
+
+<span class="cmt">// Create a chart</span>
+<span class="kw">const</span> chart = <span class="kw">new</span> <span class="fn">Chart</span>(document.<span class="fn">getElementById</span>(<span class="str">'chart'</span>)!, {
+  theme: <span class="str">'dark'</span>,
+  autoScale: <span class="bool">true</span>,
+  features: {
+    drawings: <span class="bool">true</span>,
+    indicators: <span class="bool">true</span>,
+    trading: <span class="bool">true</span>,
+    volume: <span class="bool">true</span>,
+  },
+})
+
+<span class="cmt">// Connect to live Binance data</span>
+<span class="kw">const</span> adapter = <span class="kw">new</span> <span class="fn">BinanceAdapter</span>()
+chart.<span class="fn">connect</span>({
+  adapter,
+  symbol: <span class="str">'BTCUSDT'</span>,
+  timeframe: <span class="str">'5m'</span>,
+  historyLimit: <span class="bool">300</span>,
+})</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-links">
+      <span>MIT License</span>
+      <span class="footer-sep">|</span>
+      <a href="https://github.com/bonguynvan/tradecanvas" target="_blank" rel="noopener">GitHub</a>
+      <span class="footer-sep">|</span>
+      <a href="https://www.npmjs.com/package/@tradecanvas/chart" target="_blank" rel="noopener">npm</a>
+    </div>
+  </footer>
+
+</body>
+</html>

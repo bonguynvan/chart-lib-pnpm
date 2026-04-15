@@ -1,12 +1,12 @@
 {
   "name": "@tradecanvas/chart",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "High-performance canvas trading chart with built-in indicators, drawing tools, and real-time streaming. Zero external dependencies.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bonguynvan/chart-lib-pnpm.git",
+    "url": "https://github.com/bonguynvan/tradecanvas.git",
     "directory": "packages/library"
   },
   "publishConfig": {
@@ -14,7 +14,7 @@
   },
   "sideEffects": false,
   "keywords": ["trading", "chart", "canvas", "candlestick", "ohlc", "indicators", "drawing-tools", "technical-analysis", "financial-chart", "real-time", "typescript"],
-  "homepage": "https://github.com/bonguynvan/chart-lib-pnpm",
+  "homepage": "https://github.com/bonguynvan/tradecanvas",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -33,7 +33,7 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@tradecanvas/commons": "workspace:*",
-    "@tradecanvas/core": "workspace:*"
+    "@tradecanvas/commons": "^0.1.0",
+    "@tradecanvas/core": "^0.1.0"
   }
 }

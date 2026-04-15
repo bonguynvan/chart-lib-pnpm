@@ -2,8 +2,7 @@
 
 High-performance canvas trading chart with built-in indicators, drawing tools, and real-time streaming. Zero external dependencies.
 
-<!-- TODO: Add hero screenshot — dark theme, candlestick chart with Bollinger Bands + RSI panel, a trendline drawing, and a position overlay showing entry + SL/TP lines -->
-<!-- ![TradeCanvas](./docs/hero-dark.png) -->
+**[Live Demo](https://bonguynvan.github.io/tradecanvas/)** | **[GitHub](https://github.com/bonguynvan/tradecanvas)** | **[npm](https://www.npmjs.com/package/@tradecanvas/chart)**
 
 ## Why TradeCanvas?
 
@@ -249,6 +248,15 @@ interface OHLCBar {
   volume: number
 }
 ```
+
+## Examples
+
+| Example | Description |
+|---|---|
+| [Live Demo](https://bonguynvan.github.io/tradecanvas/) | Full-featured demo with live Binance data |
+| [examples/basic](./examples/basic/) | Vanilla JS + live Binance streaming |
+| [examples/vanilla-static](./examples/vanilla-static/) | Vanilla JS + static data (no network required) |
+| [examples/react](./examples/react/) | React component wrapper with full prop control |
 
 ## Browser Support
 

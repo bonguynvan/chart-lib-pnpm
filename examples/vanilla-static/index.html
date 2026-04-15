@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradeCanvas — Static Data Example</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      color: #e1e1e6;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      border-bottom: 1px solid #1e1e2e;
+      flex-wrap: wrap;
+    }
+    header h1 { font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .separator {
+      width: 1px;
+      height: 20px;
+      background: #2e2e3e;
+    }
+    .group-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+    }
+    .controls { display: flex; gap: 6px; align-items: center; }
+    .controls button {
+      padding: 6px 12px;
+      font-size: 11px;
+      border: 1px solid #2e2e3e;
+      border-radius: 4px;
+      background: transparent;
+      color: #a1a1aa;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .controls button:hover { background: #1e1e2e; color: #e1e1e6; }
+    .controls button.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+    select {
+      padding: 6px 8px;
+      font-size: 11px;
+      border: 1px solid #2e2e3e;
+      border-radius: 4px;
+      background: #0a0a0f;
+      color: #e1e1e6;
+      cursor: pointer;
+    }
+    #chart-container {
+      width: 100%;
+      height: calc(100vh - 50px);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TradeCanvas -- Static Data</h1>
+
+    <div class="separator"></div>
+
+    <div class="controls" id="chart-types">
+      <span class="group-label">Type</span>
+      <button data-type="candlestick" class="active">Candlestick</button>
+      <button data-type="line">Line</button>
+      <button data-type="area">Area</button>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="controls" id="indicators">
+      <span class="group-label">Indicators</span>
+      <button id="btn-sma">SMA</button>
+      <button id="btn-rsi">RSI</button>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="controls" id="drawings">
+      <span class="group-label">Draw</span>
+      <select id="drawing-tool">
+        <option value="">Off</option>
+        <option value="trendLine">Trend Line</option>
+        <option value="horizontalLine">H-Line</option>
+        <option value="rectangle">Rectangle</option>
+        <option value="fibRetracement">Fib Retrace</option>
+      </select>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="controls">
+      <button id="btn-theme">Toggle Theme</button>
+      <button id="btn-screenshot">Screenshot</button>
+    </div>
+  </header>
+
+  <div id="chart-container"></div>
+
+  <script type="module">
+    // When published: import { Chart, DARK_THEME, LIGHT_THEME } from '@tradecanvas/chart'
+    import {
+      Chart,
+      DARK_THEME,
+      LIGHT_THEME,
+    } from '../../packages/library/src/index.ts';
+
+    // ---- Generate static OHLCV data (100 bars, 1-hour interval) ----
+
+    function generateStaticData(barCount, startPrice, intervalSeconds) {
+      const bars = [];
+      const startTime = Math.floor(Date.now() / 1000) - barCount * intervalSeconds;
+      let price = startPrice;
+
+      for (let i = 0; i < barCount; i++) {
+        const time = startTime + i * intervalSeconds;
+        const open = price;
+
+        // Random walk with slight upward drift
+        const change = (Math.random() - 0.48) * 2.5;
+        const close = Math.max(1, open + change);
+
+        // High is above both open and close; low is below both
+        const upperWick = Math.random() * 1.5;
+        const lowerWick = Math.random() * 1.5;
+        const high = Math.max(open, close) + upperWick;
+        const low = Math.max(0.5, Math.min(open, close) - lowerWick);
+
+        const volume = 500 + Math.random() * 2000 + (Math.abs(change) > 1.5 ? 1500 : 0);
+
+        bars.push({
+          time,
+          open: parseFloat(open.toFixed(2)),
+          high: parseFloat(high.toFixed(2)),
+          low: parseFloat(low.toFixed(2)),
+          close: parseFloat(close.toFixed(2)),
+          volume: parseFloat(volume.toFixed(0)),
+        });
+
+        price = close;
+      }
+
+      return bars;
+    }
+
+    const data = generateStaticData(100, 100, 3600);
+
+    // ---- Create chart ----
+
+    const container = document.getElementById('chart-container');
+    let isDark = true;
+
+    const chart = new Chart(container, {
+      chartType: 'candlestick',
+      theme: DARK_THEME,
+      autoScale: true,
+      rightMargin: 5,
+      crosshair: { mode: 'magnet' },
+      watermark: { text: 'STATIC / USD', fontSize: 48, color: 'rgba(255,255,255,0.03)' },
+      features: {
+        drawings: true,
+        drawingMagnet: true,
+        drawingUndoRedo: true,
+        indicators: true,
+        trading: true,
+        volume: true,
+        legend: true,
+        crosshair: true,
+        keyboard: true,
+        screenshot: true,
+        logScale: true,
+        watermark: true,
+      },
+    });
+
+    // ---- Load static data ----
+
+    chart.setData(data);
+
+    // ---- Demo: Trading position with SL/TP ----
+
+    const lastBar = data[data.length - 1];
+
+    chart.setPositions([
+      {
+        id: 'pos-1',
+        side: 'buy',
+        entryPrice: lastBar.close - 3,
+        quantity: 10,
+        stopLoss: lastBar.close - 8,
+        takeProfit: lastBar.close + 6,
+      },
+    ]);
+
+    // ---- Demo: Pending limit order ----
+
+    chart.setOrders([
+      {
+        id: 'order-1',
+        side: 'buy',
+        type: 'limit',
+        price: lastBar.close - 12,
+        quantity: 5,
+        label: 'LIMIT',
+        draggable: true,
+      },
+    ]);
+
+    // ---- Chart type switcher ----
+
+    document.getElementById('chart-types').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      document.querySelectorAll('#chart-types button').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      chart.setChartType(btn.dataset.type);
+    });
+
+    // ---- Indicator toggles ----
+
+    const indicatorMap = {
+      'btn-sma': 'sma',
+      'btn-rsi': 'rsi',
+    };
+    const activeIndicators = new Map();
+
+    Object.entries(indicatorMap).forEach(([btnId, indicatorId]) => {
+      document.getElementById(btnId).addEventListener('click', (e) => {
+        const btn = e.target;
+        if (activeIndicators.has(indicatorId)) {
+          chart.removeIndicator(activeIndicators.get(indicatorId));
+          activeIndicators.delete(indicatorId);
+          btn.classList.remove('active');
+        } else {
+          const instanceId = chart.addIndicator(indicatorId);
+          if (instanceId) {
+            activeIndicators.set(indicatorId, instanceId);
+            btn.classList.add('active');
+          }
+        }
+      });
+    });
+
+    // ---- Drawing tool selector ----
+
+    document.getElementById('drawing-tool').addEventListener('change', (e) => {
+      const tool = e.target.value || null;
+      chart.setDrawingTool(tool);
+    });
+
+    // ---- Theme toggle ----
+
+    document.getElementById('btn-theme').addEventListener('click', () => {
+      isDark = !isDark;
+      chart.setTheme(isDark ? DARK_THEME : LIGHT_THEME);
+      document.body.style.background = isDark ? '#0a0a0f' : '#ffffff';
+      document.body.style.color = isDark ? '#e1e1e6' : '#1a1a2e';
+      document.querySelector('header').style.borderBottomColor = isDark ? '#1e1e2e' : '#e0e0e0';
+
+      // Update control styles for light/dark
+      const borderColor = isDark ? '#2e2e3e' : '#d0d0d0';
+      document.querySelectorAll('.controls button').forEach((btn) => {
+        if (!btn.classList.contains('active')) {
+          btn.style.borderColor = borderColor;
+        }
+      });
+      document.querySelectorAll('select').forEach((sel) => {
+        sel.style.borderColor = borderColor;
+        sel.style.background = isDark ? '#0a0a0f' : '#ffffff';
+        sel.style.color = isDark ? '#e1e1e6' : '#1a1a2e';
+      });
+      document.querySelectorAll('.separator').forEach((sep) => {
+        sep.style.background = borderColor;
+      });
+    });
+
+    // ---- Screenshot ----
+
+    document.getElementById('btn-screenshot').addEventListener('click', () => {
+      chart.screenshot();
+    });
+  </script>
+</body>
+</html>
