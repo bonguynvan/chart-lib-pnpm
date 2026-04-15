@@ -103,6 +103,7 @@
       <div class="code-tabs-header">
         <button class="code-tab-btn active" data-tab-target="tab-vanilla">Vanilla JS</button>
         <button class="code-tab-btn" data-tab-target="tab-react">React</button>
+        <button class="code-tab-btn" data-tab-target="tab-svelte">Svelte</button>
         <button class="code-tab-btn" data-tab-target="tab-vue">Vue</button>
         <button class="code-copy-btn" data-copy-tabs>Copy</button>
       </div>
@@ -161,6 +162,51 @@ chart.<span class="fn">setData</span>(bars)</pre>
 
   <span class="kw">return</span> &lt;<span class="obj">div</span> ref={'{'}containerRef{'}'} style={'{'}{'{'} width: <span class="str">'100%'</span>, height: <span class="str">'600px'</span> {'}'}{'}'}  /&gt;
 {'}'}</pre>
+        </div>
+      </div>
+
+      <div class="code-tab-panel" id="tab-svelte">
+        <div class="code-body">
+          <pre><span class="cmt">&lt;!-- TradingChart.svelte --&gt;</span>
+&lt;<span class="obj">script</span> lang=<span class="str">"ts"</span>&gt;
+  <span class="kw">import</span> {'{'} onMount, onDestroy {'}'} <span class="kw">from</span> <span class="str">'svelte'</span>
+  <span class="kw">import</span> {'{'} <span class="obj">Chart</span>, <span class="obj">BinanceAdapter</span>, <span class="obj">DARK_THEME</span> {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/chart'</span>
+  <span class="kw">import type</span> {'{'} <span class="obj">ChartType</span>, <span class="obj">TimeFrame</span> {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/chart'</span>
+
+  <span class="kw">interface</span> <span class="obj">Props</span> {'{'}
+    symbol?: <span class="obj">string</span>
+    timeframe?: <span class="obj">TimeFrame</span>
+    chartType?: <span class="obj">ChartType</span>
+  {'}'}
+
+  <span class="kw">let</span> {'{'} symbol = <span class="str">'BTCUSDT'</span>, timeframe = <span class="str">'5m'</span>, chartType = <span class="str">'candlestick'</span> {'}'}: <span class="obj">Props</span> = <span class="fn">$props</span>()
+  <span class="kw">let</span> container: <span class="obj">HTMLDivElement</span>
+  <span class="kw">let</span> chart: <span class="obj">Chart</span> | <span class="bool">null</span> = <span class="bool">null</span>
+
+  <span class="fn">onMount</span>(() =&gt; {'{'}
+    chart = <span class="kw">new</span> <span class="fn">Chart</span>(container, {'{'}
+      chartType,
+      theme: <span class="obj">DARK_THEME</span>,
+      autoScale: <span class="bool">true</span>,
+      features: {'{'} drawings: <span class="bool">true</span>, indicators: <span class="bool">true</span>, volume: <span class="bool">true</span> {'}'},
+    {'}'})
+
+    <span class="kw">const</span> adapter = <span class="kw">new</span> <span class="fn">BinanceAdapter</span>()
+    chart.<span class="fn">connect</span>({'{'} adapter, symbol, timeframe {'}'})
+  {'}'})
+
+  <span class="fn">onDestroy</span>(() =&gt; chart?.<span class="fn">destroy</span>())
+
+  <span class="cmt">// React to prop changes</span>
+  <span class="fn">$effect</span>(() =&gt; {'{'}
+    <span class="kw">if</span> (!chart) <span class="kw">return</span>
+    chart.<span class="fn">disconnectStream</span>()
+    <span class="kw">const</span> adapter = <span class="kw">new</span> <span class="fn">BinanceAdapter</span>()
+    chart.<span class="fn">connect</span>({'{'} adapter, symbol, timeframe {'}'})
+  {'}'})
+&lt;/<span class="obj">script</span>&gt;
+
+&lt;<span class="obj">div</span> bind:this={'{'}container{'}'} style=<span class="str">"width: 100%; height: 600px"</span> /&gt;</pre>
         </div>
       </div>
 

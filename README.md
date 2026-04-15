@@ -292,6 +292,71 @@ function TradingChart() {
 }
 ```
 
+**Svelte:**
+
+```svelte
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte'
+  import { Chart, BinanceAdapter, DARK_THEME } from '@tradecanvas/chart'
+  import type { TimeFrame } from '@tradecanvas/chart'
+
+  interface Props { symbol?: string; timeframe?: TimeFrame }
+  let { symbol = 'BTCUSDT', timeframe = '5m' }: Props = $props()
+
+  let container: HTMLDivElement
+  let chart: Chart | null = null
+
+  onMount(() => {
+    chart = new Chart(container, {
+      chartType: 'candlestick',
+      theme: DARK_THEME,
+      autoScale: true,
+      features: { indicators: true, drawings: true, volume: true },
+    })
+    chart.connect({ adapter: new BinanceAdapter(), symbol, timeframe })
+  })
+
+  onDestroy(() => chart?.destroy())
+
+  $effect(() => {
+    if (!chart) return
+    chart.disconnectStream()
+    chart.connect({ adapter: new BinanceAdapter(), symbol, timeframe })
+  })
+</script>
+
+<div bind:this={container} style="width: 100%; height: 600px" />
+```
+
+**Vue:**
+
+```vue
+<template>
+  <div ref="chartContainer" style="width: 100%; height: 600px" />
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+import { Chart, BinanceAdapter, DARK_THEME } from '@tradecanvas/chart'
+
+const chartContainer = ref<HTMLDivElement>()
+let chart: Chart | null = null
+
+onMounted(() => {
+  if (!chartContainer.value) return
+  chart = new Chart(chartContainer.value, {
+    chartType: 'candlestick',
+    theme: DARK_THEME,
+    autoScale: true,
+    features: { indicators: true, drawings: true, volume: true },
+  })
+  chart.connect({ adapter: new BinanceAdapter(), symbol: 'BTCUSDT', timeframe: '5m' })
+})
+
+onUnmounted(() => chart?.destroy())
+</script>
+```
+
 ## Architecture
 
 Multi-layer canvas for optimal rendering — only dirty layers repaint each frame:
