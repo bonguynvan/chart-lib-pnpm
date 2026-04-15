@@ -4,47 +4,166 @@ import {
   DARK_THEME,
   LIGHT_THEME,
 } from '@tradecanvas/chart';
-import type { ChartType, DrawingToolType, TimeFrame } from '@tradecanvas/chart';
+import type { ChartType, DrawingToolType, TimeFrame, Theme } from '@tradecanvas/chart';
 
-// ─── State ──────────────────────────────────────────────────────────────────
+// ─── Types ─────────────────────────────────────────────────────────────────
+
+interface ChartTypeOption {
+  readonly value: ChartType;
+  readonly label: string;
+}
+
+interface IndicatorDef {
+  readonly id: string;
+  readonly name: string;
+  readonly type: 'overlay' | 'panel';
+}
+
+interface DrawingToolGroup {
+  readonly name: string;
+  readonly icon: string;
+  readonly tools: ReadonlyArray<{ readonly type: DrawingToolType; readonly label: string }>;
+}
+
+// ─── Constants ─────────────────────────────────────────────────────────────
+
+const CHART_TYPES: ReadonlyArray<ChartTypeOption> = [
+  { value: 'candlestick', label: 'Candlestick' },
+  { value: 'line', label: 'Line' },
+  { value: 'area', label: 'Area' },
+  { value: 'hollowCandle', label: 'Hollow Candle' },
+  { value: 'heikinAshi', label: 'Heikin-Ashi' },
+  { value: 'bar', label: 'Bar' },
+];
+
+const INDICATORS: ReadonlyArray<IndicatorDef> = [
+  { id: 'sma', name: 'SMA', type: 'overlay' },
+  { id: 'ema', name: 'EMA', type: 'overlay' },
+  { id: 'bollinger', name: 'Bollinger Bands', type: 'overlay' },
+  { id: 'vwap', name: 'VWAP', type: 'overlay' },
+  { id: 'ichimoku', name: 'Ichimoku Cloud', type: 'overlay' },
+  { id: 'parabolicsar', name: 'Parabolic SAR', type: 'overlay' },
+  { id: 'supertrend', name: 'Supertrend', type: 'overlay' },
+  { id: 'keltner', name: 'Keltner Channel', type: 'overlay' },
+  { id: 'donchian', name: 'Donchian Channel', type: 'overlay' },
+  { id: 'rsi', name: 'RSI', type: 'panel' },
+  { id: 'macd', name: 'MACD', type: 'panel' },
+  { id: 'stochastic', name: 'Stochastic', type: 'panel' },
+  { id: 'atr', name: 'ATR', type: 'panel' },
+  { id: 'adx', name: 'ADX', type: 'panel' },
+  { id: 'obv', name: 'OBV', type: 'panel' },
+  { id: 'williamsr', name: 'Williams %R', type: 'panel' },
+  { id: 'cci', name: 'CCI', type: 'panel' },
+  { id: 'mfi', name: 'MFI', type: 'panel' },
+  { id: 'roc', name: 'ROC', type: 'panel' },
+  { id: 'tsi', name: 'TSI', type: 'panel' },
+  { id: 'cmf', name: 'CMF', type: 'panel' },
+];
+
+const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
+  {
+    name: 'Lines',
+    icon: '\u2571',  // /
+    tools: [
+      { type: 'trendLine', label: 'Trend Line' },
+      { type: 'ray', label: 'Ray' },
+      { type: 'extendedLine', label: 'Extended Line' },
+    ],
+  },
+  {
+    name: 'Horizontal / Vertical',
+    icon: '\u2500',  // ─
+    tools: [
+      { type: 'horizontalLine', label: 'Horizontal Line' },
+      { type: 'verticalLine', label: 'Vertical Line' },
+    ],
+  },
+  {
+    name: 'Channels',
+    icon: '\u2550',  // ═
+    tools: [
+      { type: 'parallelChannel', label: 'Parallel Channel' },
+      { type: 'regressionChannel', label: 'Regression Channel' },
+    ],
+  },
+  {
+    name: 'Fibonacci',
+    icon: 'F',
+    tools: [
+      { type: 'fibRetracement', label: 'Fib Retracement' },
+      { type: 'fibExtension', label: 'Fib Extension' },
+    ],
+  },
+  {
+    name: 'Shapes',
+    icon: '\u25A1',  // □
+    tools: [
+      { type: 'rectangle', label: 'Rectangle' },
+      { type: 'ellipse', label: 'Ellipse' },
+      { type: 'triangle', label: 'Triangle' },
+    ],
+  },
+  {
+    name: 'Advanced',
+    icon: 'G',
+    tools: [
+      { type: 'pitchfork', label: 'Pitchfork' },
+      { type: 'gannFan', label: 'Gann Fan' },
+      { type: 'gannBox', label: 'Gann Box' },
+      { type: 'elliottWave', label: 'Elliott Wave' },
+    ],
+  },
+  {
+    name: 'Measure',
+    icon: 'M',
+    tools: [
+      { type: 'measure', label: 'Measure' },
+      { type: 'dateRange', label: 'Date Range' },
+      { type: 'priceRange', label: 'Price Range' },
+    ],
+  },
+  {
+    name: 'Annotation',
+    icon: 'T',
+    tools: [
+      { type: 'text', label: 'Text Annotation' },
+      { type: 'arrow', label: 'Arrow' },
+    ],
+  },
+];
+
+const SYMBOLS: ReadonlyArray<{ readonly value: string; readonly label: string }> = [
+  { value: 'BTCUSDT', label: 'BTCUSDT' },
+  { value: 'ETHUSDT', label: 'ETHUSDT' },
+  { value: 'SOLUSDT', label: 'SOLUSDT' },
+  { value: 'BNBUSDT', label: 'BNBUSDT' },
+];
+
+// ─── State ─────────────────────────────────────────────────────────────────
+
 let currentSymbol = 'BTCUSDT';
 let currentTf: TimeFrame = '5m';
+let currentChartType: ChartType = 'candlestick';
 let isDark = true;
+let magnetEnabled = true;
+let activeDrawingTool: DrawingToolType | null = null;
 const activeIndicators = new Map<string, string>(); // indicatorId -> instanceId
-let activeDrawingTool: string | null = null;
 
-// ─── DOM refs ───────────────────────────────────────────────────────────────
-const container = document.getElementById('chart-container')!;
-const symbolSelect = document.getElementById('symbol') as HTMLSelectElement;
-const chartTypeSelect = document.getElementById('chart-type') as HTMLSelectElement;
-const timeframeGroup = document.getElementById('timeframes')!;
-const indicatorGroup = document.getElementById('indicators')!;
-const drawingGroup = document.getElementById('drawings')!;
-const statusDot = document.getElementById('status-dot')!;
-const statusText = document.getElementById('status-text')!;
-const statusSymbol = document.getElementById('status-symbol')!;
-const installBtn = document.getElementById('install-btn')!;
-const copyCodeBtn = document.getElementById('copy-code')!;
+// ─── DOM Helpers ───────────────────────────────────────────────────────────
 
-// ─── Chart Type mapping (HTML value -> library type) ────────────────────────
-const CHART_TYPE_MAP: Record<string, ChartType> = {
-  'candlestick': 'candlestick',
-  'line': 'line',
-  'area': 'area',
-  'hollow-candle': 'hollowCandle',
-  'heikin-ashi': 'heikinAshi',
-};
+function $(id: string): HTMLElement {
+  return document.getElementById(id)!;
+}
 
-// ─── Drawing tool mapping (HTML data-draw -> library type) ──────────────────
-const DRAWING_MAP: Record<string, DrawingToolType> = {
-  'trendline': 'trendLine',
-  'horizontal-line': 'horizontalLine',
-  'fibonacci-retracement': 'fibRetracement',
-  'rectangle': 'rectangle',
-  'measure': 'measure',
-};
+function escapeHtml(str: string): string {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
 
-// ─── Create chart ───────────────────────────────────────────────────────────
+// ─── Chart Init ────────────────────────────────────────────────────────────
+
+const container = $('chart-container');
 const chart = new Chart(container, {
   chartType: 'candlestick',
   theme: DARK_THEME,
@@ -74,7 +193,12 @@ const chart = new Chart(container, {
   },
 });
 
-// ─── Connection ─────────────────────────────────────────────────────────────
+// ─── Connection ────────────────────────────────────────────────────────────
+
+const statusDot = $('status-dot');
+const statusText = $('status-text');
+const statusSymbol = $('status-symbol');
+
 function setStatus(state: 'connecting' | 'connected' | 'error', message: string): void {
   statusDot.className = 'status-dot';
   if (state === 'connected') {
@@ -88,6 +212,7 @@ function setStatus(state: 'connecting' | 'connected' | 'error', message: string)
 async function connectStream(): Promise<void> {
   setStatus('connecting', 'Connecting...');
   statusSymbol.textContent = `${currentSymbol} ${currentTf}`;
+  $('toolbar-symbol').textContent = currentSymbol;
 
   try {
     chart.disconnectStream();
@@ -111,79 +236,290 @@ async function connectStream(): Promise<void> {
   }
 }
 
-// ─── Symbol selector ────────────────────────────────────────────────────────
-symbolSelect.addEventListener('change', () => {
-  currentSymbol = symbolSelect.value;
+// ─── Dropdown Manager ──────────────────────────────────────────────────────
+
+let openDropdownId: string | null = null;
+
+function closeAllDropdowns(): void {
+  document.querySelectorAll('.dropdown-panel.open').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.tb-dropdown.open').forEach(el => el.classList.remove('open'));
+  openDropdownId = null;
+}
+
+function toggleDropdown(btnId: string, panelId: string): void {
+  const panel = $(panelId);
+  const btn = $(btnId);
+  const isOpen = panel.classList.contains('open');
+
+  closeAllDropdowns();
+
+  if (!isOpen) {
+    panel.classList.add('open');
+    btn.classList.add('open');
+    openDropdownId = panelId;
+  }
+}
+
+document.addEventListener('click', (e: MouseEvent) => {
+  if (openDropdownId === null) return;
+  const target = e.target as HTMLElement;
+  const panel = $(openDropdownId);
+  const btnId = openDropdownId.replace('-dropdown', '-btn');
+  const btn = document.getElementById(btnId);
+  if (!panel.contains(target) && btn !== target && !btn?.contains(target)) {
+    closeAllDropdowns();
+  }
+});
+
+document.addEventListener('keydown', (e: KeyboardEvent) => {
+  if (e.key === 'Escape') closeAllDropdowns();
+});
+
+// ─── Symbol Selector (click on symbol label cycles) ────────────────────────
+
+let symbolIndex = 0;
+$('toolbar-symbol').style.cursor = 'pointer';
+$('toolbar-symbol').addEventListener('click', () => {
+  symbolIndex = (symbolIndex + 1) % SYMBOLS.length;
+  currentSymbol = SYMBOLS[symbolIndex].value;
   connectStream();
 });
 
-// ─── Timeframe buttons ──────────────────────────────────────────────────────
-timeframeGroup.addEventListener('click', (e: Event) => {
+// ─── Timeframe Buttons ─────────────────────────────────────────────────────
+
+$('timeframes').addEventListener('click', (e: Event) => {
   const btn = (e.target as HTMLElement).closest('button');
   if (!btn) return;
-  const tf = btn.dataset.tf;
+  const tf = (btn as HTMLElement).dataset.tf;
   if (!tf) return;
 
-  timeframeGroup.querySelectorAll('.tb').forEach(b => b.classList.remove('active'));
+  $('timeframes').querySelectorAll('.tb').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   currentTf = tf as TimeFrame;
   connectStream();
 });
 
-// ─── Chart type selector ────────────────────────────────────────────────────
-chartTypeSelect.addEventListener('change', () => {
-  const chartType = CHART_TYPE_MAP[chartTypeSelect.value];
-  if (chartType) {
-    chart.setChartType(chartType);
-  }
+// ─── Chart Type Dropdown ───────────────────────────────────────────────────
+
+function buildChartTypeDropdown(): void {
+  const panel = $('charttype-dropdown');
+  panel.innerHTML = CHART_TYPES.map(ct => {
+    const activeClass = ct.value === currentChartType ? ' active' : '';
+    return `<div class="dropdown-item${activeClass}" data-ct="${ct.value}">${escapeHtml(ct.label)}</div>`;
+  }).join('');
+
+  panel.addEventListener('click', (e: Event) => {
+    const item = (e.target as HTMLElement).closest('.dropdown-item') as HTMLElement | null;
+    if (!item) return;
+    const ct = item.dataset.ct as ChartType;
+    currentChartType = ct;
+    chart.setChartType(ct);
+
+    const label = CHART_TYPES.find(c => c.value === ct)?.label ?? ct;
+    $('charttype-label').textContent = label;
+
+    panel.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+    item.classList.add('active');
+    closeAllDropdowns();
+  });
+}
+
+$('charttype-btn').addEventListener('click', (e: Event) => {
+  e.stopPropagation();
+  toggleDropdown('charttype-btn', 'charttype-dropdown');
 });
 
-// ─── Indicator toggles ─────────────────────────────────────────────────────
-indicatorGroup.addEventListener('click', (e: Event) => {
-  const btn = (e.target as HTMLElement).closest('button');
-  if (!btn) return;
-  const ind = btn.dataset.ind;
-  if (!ind) return;
+buildChartTypeDropdown();
 
-  if (activeIndicators.has(ind)) {
-    const instanceId = activeIndicators.get(ind)!;
+// ─── Indicators Dropdown ───────────────────────────────────────────────────
+
+function updateIndicatorBadge(): void {
+  const count = activeIndicators.size;
+  $('indicators-badge').textContent = count > 0 ? `(${count})` : '';
+}
+
+function updateIndicatorChips(): void {
+  const chipsEl = $('indicator-chips');
+  const entries = Array.from(activeIndicators.entries());
+  chipsEl.innerHTML = entries.map(([indId]) => {
+    const def = INDICATORS.find(i => i.id === indId);
+    const name = def?.name ?? indId.toUpperCase();
+    return `<span class="indicator-chip" data-ind="${indId}">${escapeHtml(name)}<span class="chip-remove" data-remove-ind="${indId}">x</span></span>`;
+  }).join('');
+}
+
+function buildIndicatorsDropdown(): void {
+  const panel = $('indicators-dropdown');
+  panel.innerHTML = INDICATORS.map(ind => {
+    const activeClass = activeIndicators.has(ind.id) ? ' active' : '';
+    return `<div class="dropdown-item${activeClass}" data-ind="${ind.id}">
+      <span>${escapeHtml(ind.name)}</span>
+      <span class="tag">${ind.type}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleIndicator(indId: string): void {
+  if (activeIndicators.has(indId)) {
+    const instanceId = activeIndicators.get(indId)!;
     chart.removeIndicator(instanceId);
-    activeIndicators.delete(ind);
-    btn.classList.remove('active');
+    activeIndicators.delete(indId);
   } else {
-    const instanceId = chart.addIndicator(ind);
+    const instanceId = chart.addIndicator(indId);
     if (instanceId) {
-      activeIndicators.set(ind, instanceId);
-      btn.classList.add('active');
+      activeIndicators.set(indId, instanceId);
     }
   }
+  updateIndicatorBadge();
+  updateIndicatorChips();
+  buildIndicatorsDropdown();
+}
+
+$('indicators-btn').addEventListener('click', (e: Event) => {
+  e.stopPropagation();
+  toggleDropdown('indicators-btn', 'indicators-dropdown');
 });
 
-// ─── Drawing tool toggles ──────────────────────────────────────────────────
-drawingGroup.addEventListener('click', (e: Event) => {
-  const btn = (e.target as HTMLElement).closest('button');
-  if (!btn) return;
-  const drawKey = btn.dataset.draw;
-  if (!drawKey) return;
-  const toolType = DRAWING_MAP[drawKey];
-  if (!toolType) return;
+$('indicators-dropdown').addEventListener('click', (e: Event) => {
+  const item = (e.target as HTMLElement).closest('.dropdown-item') as HTMLElement | null;
+  if (!item) return;
+  const indId = item.dataset.ind;
+  if (!indId) return;
+  toggleIndicator(indId);
+});
 
-  if (activeDrawingTool === drawKey) {
-    chart.setDrawingTool(null);
-    activeDrawingTool = null;
-    btn.classList.remove('active');
+$('indicator-chips').addEventListener('click', (e: Event) => {
+  const removeBtn = (e.target as HTMLElement).closest('[data-remove-ind]') as HTMLElement | null;
+  if (!removeBtn) return;
+  const indId = removeBtn.dataset.removeInd;
+  if (!indId) return;
+  toggleIndicator(indId);
+});
+
+buildIndicatorsDropdown();
+updateIndicatorBadge();
+
+// ─── Drawing Sidebar ───────────────────────────────────────────────────────
+
+function clearActiveDrawingSidebar(): void {
+  document.querySelectorAll('.drawing-sidebar .sidebar-btn').forEach(b => b.classList.remove('active'));
+}
+
+function setActiveTool(type: DrawingToolType | null): void {
+  activeDrawingTool = type;
+  chart.setDrawingTool(type);
+  clearActiveDrawingSidebar();
+
+  if (type === null) {
+    $('cursor-btn').classList.add('active');
   } else {
-    drawingGroup.querySelectorAll('.tb').forEach(b => {
-      if ((b as HTMLElement).dataset.draw) b.classList.remove('active');
-    });
-    chart.setDrawingTool(toolType);
-    activeDrawingTool = drawKey;
-    btn.classList.add('active');
+    const toolBtn = document.querySelector(`[data-tool="${type}"]`) as HTMLElement | null;
+    if (toolBtn) toolBtn.classList.add('active');
+    const groupBtn = document.querySelector(`[data-group-default="${type}"]`) as HTMLElement | null;
+    if (groupBtn) groupBtn.classList.add('active');
   }
-});
+}
 
-// ─── Theme toggle ───────────────────────────────────────────────────────────
-document.getElementById('btn-theme')!.addEventListener('click', () => {
+function buildDrawingSidebar(): void {
+  const sidebar = $('drawing-sidebar');
+  let html = '';
+
+  // Cursor button
+  html += `<button class="sidebar-btn active" id="cursor-btn" title="Select">/</button>`;
+  html += `<div class="sidebar-divider"></div>`;
+
+  // Tool groups
+  for (const group of DRAWING_GROUPS) {
+    const defaultTool = group.tools[0];
+    const hasMultiple = group.tools.length > 1;
+    const multiDot = hasMultiple ? '<span class="multi-dot"></span>' : '';
+
+    html += `<button class="sidebar-btn" data-group-default="${defaultTool.type}" title="${group.name}">`;
+    html += escapeHtml(group.icon);
+    html += multiDot;
+
+    if (hasMultiple) {
+      html += `<div class="flyout-menu">`;
+      html += `<div class="flyout-header">${escapeHtml(group.name)}</div>`;
+      for (const tool of group.tools) {
+        html += `<button class="flyout-item" data-tool="${tool.type}">${escapeHtml(tool.label)}</button>`;
+      }
+      html += `</div>`;
+    }
+    html += `</button>`;
+  }
+
+  // Spacer
+  html += `<div class="sidebar-spacer"></div>`;
+  html += `<div class="sidebar-divider"></div>`;
+
+  // Bottom actions
+  html += `<button class="sidebar-btn" id="btn-magnet" title="Magnet Snap"><span style="font-size:13px">\u2299</span></button>`;
+  html += `<button class="sidebar-btn" id="btn-undo" title="Undo"><span style="font-size:13px">\u21B6</span></button>`;
+  html += `<button class="sidebar-btn" id="btn-redo" title="Redo"><span style="font-size:13px">\u21B7</span></button>`;
+  html += `<button class="sidebar-btn" id="btn-clear-drawings" title="Clear Drawings"><span style="font-size:13px">\u2715</span></button>`;
+
+  sidebar.innerHTML = html;
+
+  // Set magnet initial state
+  if (magnetEnabled) {
+    $('btn-magnet').classList.add('active');
+  }
+
+  // Event: cursor button
+  $('cursor-btn').addEventListener('click', () => setActiveTool(null));
+
+  // Event: group default buttons
+  sidebar.querySelectorAll('[data-group-default]').forEach(btn => {
+    btn.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement;
+      // Ignore if click was inside flyout
+      if (target.closest('.flyout-item')) return;
+      const toolType = (btn as HTMLElement).dataset.groupDefault as DrawingToolType;
+      setActiveTool(activeDrawingTool === toolType ? null : toolType);
+    });
+  });
+
+  // Event: flyout items
+  sidebar.querySelectorAll('.flyout-item').forEach(item => {
+    item.addEventListener('click', (e: Event) => {
+      e.stopPropagation();
+      const toolType = (item as HTMLElement).dataset.tool as DrawingToolType;
+      setActiveTool(toolType);
+
+      // Update the group button's default to this tool
+      const groupBtn = (item as HTMLElement).closest('.sidebar-btn') as HTMLElement;
+      if (groupBtn) {
+        groupBtn.dataset.groupDefault = toolType;
+      }
+    });
+  });
+
+  // Event: magnet toggle
+  $('btn-magnet').addEventListener('click', () => {
+    magnetEnabled = !magnetEnabled;
+    chart.setDrawingMagnet(magnetEnabled);
+    $('btn-magnet').classList.toggle('active', magnetEnabled);
+  });
+
+  // Event: undo
+  $('btn-undo').addEventListener('click', () => chart.undo());
+
+  // Event: redo
+  $('btn-redo').addEventListener('click', () => chart.redo());
+
+  // Event: clear drawings
+  $('btn-clear-drawings').addEventListener('click', () => {
+    chart.clearDrawings();
+    setActiveTool(null);
+  });
+}
+
+buildDrawingSidebar();
+
+// ─── Theme Toggle ──────────────────────────────────────────────────────────
+
+$('btn-theme').addEventListener('click', () => {
   isDark = !isDark;
   chart.setTheme(isDark ? DARK_THEME : LIGHT_THEME);
   document.body.classList.toggle('light', !isDark);
@@ -191,14 +527,124 @@ document.getElementById('btn-theme')!.addEventListener('click', () => {
     fontSize: 48,
     color: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
   });
+  // Sync settings modal colors
+  syncSettingsToTheme();
 });
 
-// ─── Screenshot ─────────────────────────────────────────────────────────────
-document.getElementById('btn-screenshot')!.addEventListener('click', () => {
-  chart.screenshot();
+// ─── Screenshot ────────────────────────────────────────────────────────────
+
+$('btn-screenshot').addEventListener('click', () => chart.screenshot());
+
+// ─── Settings Modal ────────────────────────────────────────────────────────
+
+const backdrop = $('settings-backdrop');
+const modal = $('settings-modal');
+
+function openSettings(): void {
+  syncSettingsToTheme();
+  backdrop.classList.add('open');
+}
+
+function closeSettings(): void {
+  backdrop.classList.remove('open');
+}
+
+$('btn-settings').addEventListener('click', () => openSettings());
+$('settings-close').addEventListener('click', () => closeSettings());
+$('settings-done').addEventListener('click', () => closeSettings());
+
+backdrop.addEventListener('click', (e: Event) => {
+  if (e.target === backdrop) closeSettings();
 });
 
-// ─── Copy install command ───────────────────────────────────────────────────
+document.addEventListener('keydown', (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && backdrop.classList.contains('open')) {
+    closeSettings();
+  }
+});
+
+// Settings tabs
+$('settings-modal').querySelectorAll('.modal-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const tabName = (tab as HTMLElement).dataset.tab;
+    if (!tabName) return;
+
+    modal.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    modal.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const content = modal.querySelector(`[data-tab-content="${tabName}"]`);
+    if (content) content.classList.add('active');
+  });
+});
+
+// Color pickers
+function setupColorPicker(inputId: string, hexId: string, themeKey: keyof Theme): void {
+  const input = $(inputId) as HTMLInputElement;
+  const hex = $(hexId);
+
+  input.addEventListener('input', () => {
+    hex.textContent = input.value.toUpperCase();
+    applyThemeColor(themeKey, input.value);
+  });
+}
+
+function applyThemeColor(key: keyof Theme, value: string): void {
+  const baseTheme = isDark ? DARK_THEME : LIGHT_THEME;
+  const updatedTheme: Theme = { ...baseTheme, [key]: value };
+  chart.setTheme(updatedTheme);
+}
+
+setupColorPicker('color-up-body', 'hex-up-body', 'candleUp');
+setupColorPicker('color-down-body', 'hex-down-body', 'candleDown');
+setupColorPicker('color-up-wick', 'hex-up-wick', 'candleUpWick');
+setupColorPicker('color-down-wick', 'hex-down-wick', 'candleDownWick');
+setupColorPicker('color-background', 'hex-background', 'background');
+setupColorPicker('color-grid', 'hex-grid', 'grid');
+
+function syncSettingsToTheme(): void {
+  const theme = isDark ? DARK_THEME : LIGHT_THEME;
+
+  function setColorInput(inputId: string, hexId: string, value: string): void {
+    const colorVal = value.startsWith('#') ? value : '#000000';
+    ($(inputId) as HTMLInputElement).value = colorVal;
+    $(hexId).textContent = colorVal.toUpperCase();
+  }
+
+  setColorInput('color-up-body', 'hex-up-body', theme.candleUp);
+  setColorInput('color-down-body', 'hex-down-body', theme.candleDown);
+  setColorInput('color-up-wick', 'hex-up-wick', theme.candleUpWick);
+  setColorInput('color-down-wick', 'hex-down-wick', theme.candleDownWick);
+  setColorInput('color-background', 'hex-background', theme.background);
+  setColorInput('color-grid', 'hex-grid', theme.grid);
+}
+
+// Toggle switches
+document.querySelectorAll('.toggle-switch').forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('on');
+  });
+});
+
+// Reset to defaults
+$('settings-reset').addEventListener('click', () => {
+  const theme = isDark ? DARK_THEME : LIGHT_THEME;
+  chart.setTheme(theme);
+  syncSettingsToTheme();
+
+  // Reset toggles
+  $('toggle-grid').classList.add('on');
+  $('toggle-volume').classList.add('on');
+  $('toggle-legend').classList.add('on');
+  $('toggle-countdown').classList.add('on');
+  $('toggle-autoscale').classList.add('on');
+  $('toggle-logscale').classList.remove('on');
+  ($('select-crosshair') as HTMLSelectElement).value = 'magnet';
+});
+
+// ─── Copy install command ──────────────────────────────────────────────────
+
+const installBtn = $('install-btn');
 installBtn.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText('npm install @tradecanvas/chart');
@@ -211,11 +657,12 @@ installBtn.addEventListener('click', async () => {
       icon.textContent = originalText;
     }, 2000);
   } catch {
-    // Clipboard API not available, ignore silently
+    // Clipboard API not available
   }
 });
 
-// ─── Copy quick-start code ──────────────────────────────────────────────────
+// ─── Copy quick-start code ─────────────────────────────────────────────────
+
 const QUICK_START_CODE = `import { Chart, BinanceAdapter } from '@tradecanvas/chart'
 
 // Create a chart
@@ -239,6 +686,7 @@ chart.connect({
   historyLimit: 300,
 })`;
 
+const copyCodeBtn = $('copy-code');
 copyCodeBtn.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(QUICK_START_CODE);
@@ -248,9 +696,10 @@ copyCodeBtn.addEventListener('click', async () => {
       copyCodeBtn.textContent = original;
     }, 2000);
   } catch {
-    // Clipboard API not available, ignore silently
+    // Clipboard API not available
   }
 });
 
-// ─── Boot ───────────────────────────────────────────────────────────────────
+// ─── Boot ──────────────────────────────────────────────────────────────────
+
 connectStream();

@@ -13,6 +13,7 @@
       --bg: #0a0a0f;
       --bg-elevated: #111118;
       --bg-card: rgba(17, 17, 24, 0.7);
+      --bg-panel: #16161f;
       --border: #1e1e2e;
       --border-subtle: #16161f;
       --text: #e1e1e6;
@@ -20,6 +21,7 @@
       --text-dim: #a1a1aa;
       --accent: #3b82f6;
       --accent-glow: rgba(59, 130, 246, 0.15);
+      --accent-dim: rgba(59, 130, 246, 0.2);
       --green: #10b981;
       --red: #ef4444;
       --radius: 6px;
@@ -193,77 +195,315 @@
       border-radius: var(--radius-lg);
       overflow: hidden;
       background: var(--bg);
+      display: flex;
+      flex-direction: column;
     }
 
+    /* ── Top Toolbar ─────────────────────────────────────────────────── */
     .chart-toolbar {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
+      gap: 0;
+      padding: 0 12px;
+      height: 40px;
       border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
       background: var(--bg-elevated);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .toolbar-symbol {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 0 10px;
+      white-space: nowrap;
+      letter-spacing: -0.01em;
+    }
+
+    .toolbar-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      flex-shrink: 0;
     }
 
     .toolbar-group {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
+      padding: 0 8px;
     }
 
-    .toolbar-divider {
-      width: 1px;
-      height: 24px;
-      background: var(--border);
-      margin: 0 8px;
-    }
-
-    .toolbar-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-right: 4px;
-      white-space: nowrap;
+    .toolbar-spacer {
+      flex: 1;
     }
 
     .tb {
-      padding: 5px 10px;
+      padding: 4px 8px;
       font-size: 12px;
       font-family: var(--font);
-      border: 1px solid transparent;
+      border: none;
       border-radius: 4px;
       background: transparent;
       color: var(--text-dim);
       cursor: pointer;
       transition: all var(--transition);
       white-space: nowrap;
+      line-height: 1;
     }
 
     .tb:hover { background: rgba(255,255,255,0.04); color: var(--text); }
-    .tb.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .tb.active { background: var(--accent); color: white; }
 
-    .tb-select {
-      padding: 5px 8px;
+    /* Dropdown trigger buttons */
+    .tb-dropdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
       font-size: 12px;
       font-family: var(--font);
-      border: 1px solid var(--border);
+      border: none;
       border-radius: 4px;
-      background: var(--bg);
-      color: var(--text);
+      background: transparent;
+      color: var(--text-dim);
       cursor: pointer;
-      appearance: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b6b7b' stroke-width='1.5'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      padding-right: 24px;
+      transition: all var(--transition);
+      white-space: nowrap;
+      line-height: 1;
+      position: relative;
     }
 
-    .tb-select:hover { border-color: var(--text-muted); }
+    .tb-dropdown:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .tb-dropdown.active { color: var(--text); }
 
-    #chart-container {
+    .tb-dropdown .chevron {
+      font-size: 9px;
+      opacity: 0.5;
+      transition: transform var(--transition);
+    }
+
+    .tb-dropdown.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .tb-dropdown .badge-count {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Icon-style toolbar button */
+    .tb-icon {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-family: var(--font);
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+      line-height: 1;
+    }
+
+    .tb-icon:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+
+    /* Indicator chips */
+    .indicator-chips {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 4px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+
+    .indicator-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px 2px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 4px;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+
+    .indicator-chip .chip-remove {
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 10px;
+      padding: 0 2px;
+      transition: opacity var(--transition);
+    }
+
+    .indicator-chip .chip-remove:hover { opacity: 1; }
+
+    /* ── Dropdown Panel ──────────────────────────────────────────────── */
+    .dropdown-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      min-width: 180px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 50;
+      padding: 4px 0;
+      display: none;
+    }
+
+    .dropdown-panel.open { display: block; }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
       width: 100%;
+    }
+
+    .dropdown-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .dropdown-item.active { color: var(--accent); }
+
+    .dropdown-item .tag {
+      font-size: 10px;
+      color: var(--text-muted);
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ── Chart Body (sidebar + canvas) ───────────────────────────────── */
+    .chart-body {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Drawing Sidebar ─────────────────────────────────────────────── */
+    .drawing-sidebar {
+      width: 36px;
+      flex-shrink: 0;
+      background: var(--bg-elevated);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .sidebar-btn {
+      width: 36px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      font-family: var(--font);
+      transition: all var(--transition);
+      position: relative;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .sidebar-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .sidebar-btn.active { color: var(--accent); background: var(--accent-glow); }
+
+    .sidebar-btn .multi-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .sidebar-divider {
+      width: 20px;
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+      flex-shrink: 0;
+    }
+
+    .sidebar-spacer {
+      flex: 1;
+    }
+
+    /* ── Flyout Submenu ──────────────────────────────────────────────── */
+    .flyout-menu {
+      position: absolute;
+      left: 100%;
+      top: 0;
+      margin-left: 2px;
+      min-width: 160px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 30;
+      padding: 4px 0;
+      display: none;
+    }
+
+    .sidebar-btn:hover > .flyout-menu,
+    .flyout-menu:hover {
+      display: block;
+    }
+
+    .flyout-header {
+      text-transform: uppercase;
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      padding: 6px 12px;
+      font-weight: 600;
+    }
+
+    .flyout-item {
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      width: 100%;
+      display: block;
+      border: none;
+      background: none;
+      text-align: left;
+      font-family: var(--font);
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .flyout-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .flyout-item.active { color: var(--accent); }
+
+    /* ── Chart Container ─────────────────────────────────────────────── */
+    #chart-container {
+      flex: 1;
+      min-width: 0;
       height: 65vh;
       min-height: 450px;
     }
@@ -278,6 +518,7 @@
       background: var(--bg-elevated);
       font-size: 11px;
       color: var(--text-muted);
+      flex-shrink: 0;
     }
 
     .status-indicator {
@@ -296,6 +537,252 @@
 
     .status-dot.connected { background: var(--green); }
     .status-dot.error { background: var(--red); }
+
+    /* ── Settings Modal ──────────────────────────────────────────────── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 480px;
+      max-width: 90vw;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: all var(--transition);
+    }
+
+    .modal-close:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+
+    .modal-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-tab {
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color var(--transition);
+      font-family: var(--font);
+    }
+
+    .modal-tab:hover { color: var(--text-dim); }
+    .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-body .tab-content { display: none; }
+    .modal-body .tab-content.active { display: block; }
+
+    .settings-section {
+      margin-bottom: 20px;
+    }
+
+    .settings-section:last-child { margin-bottom: 0; }
+
+    .settings-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .settings-row + .settings-row {
+      border-top: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .settings-label {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .settings-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Color picker */
+    .color-picker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .color-picker-wrap input[type="color"] {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: none;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .color-picker-wrap input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .color-picker-wrap input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 2px;
+    }
+
+    .color-hex {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      min-width: 60px;
+    }
+
+    /* Toggle switch */
+    .toggle-switch {
+      width: 36px;
+      height: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition);
+      border: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: all var(--transition);
+    }
+
+    .toggle-switch.on {
+      background: var(--accent);
+    }
+
+    .toggle-switch.on::after {
+      left: 18px;
+      background: white;
+    }
+
+    /* Settings select */
+    .settings-select {
+      padding: 4px 8px;
+      font-size: 12px;
+      font-family: var(--font);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-footer .reset-link {
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: var(--font);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color var(--transition);
+    }
+
+    .modal-footer .reset-link:hover { color: var(--text-dim); }
+
+    .modal-footer .done-btn {
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background var(--transition);
+    }
+
+    .modal-footer .done-btn:hover { background: #2563eb; }
 
     /* ── Feature Cards ───────────────────────────────────────────────── */
     .features-section {
@@ -467,12 +954,14 @@
       --bg: #fafafa;
       --bg-elevated: #ffffff;
       --bg-card: rgba(255, 255, 255, 0.8);
+      --bg-panel: #f5f5f8;
       --border: #e2e2ea;
       --border-subtle: #ececf0;
       --text: #1a1a2e;
       --text-muted: #8888a0;
       --text-dim: #555566;
       --accent-glow: rgba(59, 130, 246, 0.08);
+      --accent-dim: rgba(59, 130, 246, 0.1);
     }
 
     body.light .hero-title {
@@ -487,18 +976,33 @@
     body.light .code-body .str { color: #059669; }
     body.light .code-body .cmt { color: #9ca3af; }
 
+    body.light .toggle-switch { background: rgba(0,0,0,0.1); }
+    body.light .toggle-switch::after { background: #888; }
+    body.light .toggle-switch.on { background: var(--accent); }
+    body.light .toggle-switch.on::after { background: white; }
+
+    body.light .sidebar-btn:hover { background: rgba(0,0,0,0.04); }
+    body.light .tb:hover,
+    body.light .tb-dropdown:hover,
+    body.light .tb-icon:hover { background: rgba(0,0,0,0.04); }
+    body.light .dropdown-item:hover,
+    body.light .flyout-item:hover { background: rgba(0,0,0,0.04); }
+
     /* ── Responsive ──────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       .hero { padding: 40px 16px 24px; }
       .chart-section { padding: 0 12px 32px; }
-      .chart-toolbar { padding: 8px 10px; gap: 6px; }
-      .toolbar-divider { display: none; }
+      .chart-toolbar { padding: 0 8px; height: 36px; }
+      .toolbar-sep { display: none; }
+      .drawing-sidebar { width: 32px; }
+      .sidebar-btn { width: 32px; height: 28px; font-size: 12px; }
       #chart-container { height: 50vh; min-height: 350px; }
       .feature-grid { grid-template-columns: 1fr; }
       .badge-row { gap: 16px; }
+      .indicator-chips { display: none; }
     }
   </style>
-  <script type="module" crossorigin src="/tradecanvas/assets/index-D6ryDA7O.js"></script>
+  <script type="module" crossorigin src="/tradecanvas/assets/index-wIQnTXls.js"></script>
 </head>
 <body>
 
@@ -527,20 +1031,14 @@
   <!-- ── Chart ─────────────────────────────────────────────────────── -->
   <section class="chart-section">
     <div class="chart-wrapper">
-      <div class="chart-toolbar">
+
+      <!-- Top Toolbar -->
+      <div class="chart-toolbar" id="chart-toolbar">
         <!-- Symbol -->
-        <div class="toolbar-group">
-          <select class="tb-select" id="symbol">
-            <option value="BTCUSDT" selected>BTC / USDT</option>
-            <option value="ETHUSDT">ETH / USDT</option>
-            <option value="SOLUSDT">SOL / USDT</option>
-            <option value="BNBUSDT">BNB / USDT</option>
-          </select>
-        </div>
+        <span class="toolbar-symbol" id="toolbar-symbol">BTCUSDT</span>
+        <span class="toolbar-sep"></span>
 
-        <div class="toolbar-divider"></div>
-
-        <!-- Timeframe -->
+        <!-- Timeframes -->
         <div class="toolbar-group" id="timeframes">
           <button class="tb" data-tf="1m">1m</button>
           <button class="tb active" data-tf="5m">5m</button>
@@ -549,56 +1047,49 @@
           <button class="tb" data-tf="4h">4H</button>
           <button class="tb" data-tf="1d">1D</button>
         </div>
+        <span class="toolbar-sep"></span>
 
-        <div class="toolbar-divider"></div>
+        <!-- Chart Type Dropdown -->
+        <div style="position:relative;" id="charttype-dropdown-wrap">
+          <button class="tb-dropdown" id="charttype-btn">
+            <span id="charttype-label">Candlestick</span>
+            <span class="chevron">&#9662;</span>
+          </button>
+          <div class="dropdown-panel" id="charttype-dropdown"></div>
+        </div>
+        <span class="toolbar-sep"></span>
 
-        <!-- Chart Type -->
-        <div class="toolbar-group">
-          <span class="toolbar-label">Type</span>
-          <select class="tb-select" id="chart-type">
-            <option value="candlestick">Candlestick</option>
-            <option value="line">Line</option>
-            <option value="area">Area</option>
-            <option value="hollow-candle">Hollow Candle</option>
-            <option value="heikin-ashi">Heikin-Ashi</option>
-          </select>
+        <!-- Indicators Dropdown -->
+        <div style="position:relative;" id="indicators-dropdown-wrap">
+          <button class="tb-dropdown" id="indicators-btn">
+            <span>Indicators</span>
+            <span class="badge-count" id="indicators-badge"></span>
+            <span class="chevron">&#9662;</span>
+          </button>
+          <div class="dropdown-panel" id="indicators-dropdown"></div>
         </div>
 
-        <div class="toolbar-divider"></div>
+        <!-- Indicator chips -->
+        <div class="indicator-chips" id="indicator-chips"></div>
 
-        <!-- Indicators -->
-        <div class="toolbar-group" id="indicators">
-          <span class="toolbar-label">Indicators</span>
-          <button class="tb" data-ind="sma">SMA</button>
-          <button class="tb" data-ind="ema">EMA</button>
-          <button class="tb" data-ind="bollinger">BB</button>
-          <button class="tb" data-ind="rsi">RSI</button>
-          <button class="tb" data-ind="macd">MACD</button>
-        </div>
+        <span class="toolbar-spacer"></span>
 
-        <div class="toolbar-divider"></div>
-
-        <!-- Drawing Tools -->
-        <div class="toolbar-group" id="drawings">
-          <span class="toolbar-label">Draw</span>
-          <button class="tb" data-draw="trendline">Trendline</button>
-          <button class="tb" data-draw="horizontal-line">H-Line</button>
-          <button class="tb" data-draw="fibonacci-retracement">Fib</button>
-          <button class="tb" data-draw="rectangle">Rect</button>
-          <button class="tb" data-draw="measure">Measure</button>
-        </div>
-
-        <div class="toolbar-divider"></div>
-
-        <!-- Actions -->
-        <div class="toolbar-group">
-          <button class="tb" id="btn-theme" title="Toggle theme">Theme</button>
-          <button class="tb" id="btn-screenshot" title="Save screenshot">Screenshot</button>
-        </div>
+        <!-- Right-side icon buttons -->
+        <button class="tb-icon" id="btn-screenshot" title="Screenshot">&#9632;</button>
+        <button class="tb-icon" id="btn-settings" title="Settings" style="font-size:15px;">&#9881;</button>
+        <button class="tb-icon" id="btn-theme" title="Toggle theme" style="font-size:12px;">&#9681;</button>
       </div>
 
-      <div id="chart-container"></div>
+      <!-- Chart Body: sidebar + canvas -->
+      <div class="chart-body">
+        <!-- Drawing Sidebar -->
+        <div class="drawing-sidebar" id="drawing-sidebar"></div>
 
+        <!-- Chart Canvas -->
+        <div id="chart-container"></div>
+      </div>
+
+      <!-- Status Bar -->
       <div class="chart-status">
         <div class="status-indicator">
           <span class="status-dot" id="status-dot"></span>
@@ -608,6 +1099,122 @@
       </div>
     </div>
   </section>
+
+  <!-- ── Settings Modal ──────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="settings-backdrop">
+    <div class="modal" id="settings-modal">
+      <div class="modal-header">
+        <h3>Chart Settings</h3>
+        <button class="modal-close" id="settings-close">&#10005;</button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="style">Style</button>
+        <button class="modal-tab" data-tab="display">Display</button>
+        <button class="modal-tab" data-tab="scale">Scale</button>
+      </div>
+      <div class="modal-body">
+        <!-- Style Tab -->
+        <div class="tab-content active" data-tab-content="style">
+          <div class="settings-section">
+            <div class="settings-section-title">Candle Colors</div>
+            <div class="settings-row">
+              <span class="settings-label">Up Body</span>
+              <div class="color-picker-wrap">
+                <input type="color" id="color-up-body" value="#26A69A" />
+                <span class="color-hex" id="hex-up-body">#26A69A</span>
+              </div>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Down Body</span>
+              <div class="color-picker-wrap">
+                <input type="color" id="color-down-body" value="#EF5350" />
+                <span class="color-hex" id="hex-down-body">#EF5350</span>
+              </div>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Up Wick</span>
+              <div class="color-picker-wrap">
+                <input type="color" id="color-up-wick" value="#26A69A" />
+                <span class="color-hex" id="hex-up-wick">#26A69A</span>
+              </div>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Down Wick</span>
+              <div class="color-picker-wrap">
+                <input type="color" id="color-down-wick" value="#EF5350" />
+                <span class="color-hex" id="hex-down-wick">#EF5350</span>
+              </div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Background</div>
+            <div class="settings-row">
+              <span class="settings-label">Background</span>
+              <div class="color-picker-wrap">
+                <input type="color" id="color-background" value="#131722" />
+                <span class="color-hex" id="hex-background">#131722</span>
+              </div>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Grid</span>
+              <div class="color-picker-wrap">
+                <input type="color" id="color-grid" value="#1E222D" />
+                <span class="color-hex" id="hex-grid">#1E222D</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Display Tab -->
+        <div class="tab-content" data-tab-content="display">
+          <div class="settings-section">
+            <div class="settings-row">
+              <span class="settings-label">Grid Lines</span>
+              <button class="toggle-switch on" id="toggle-grid" data-setting="grid"></button>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Volume</span>
+              <button class="toggle-switch on" id="toggle-volume" data-setting="volume"></button>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">OHLC Legend</span>
+              <button class="toggle-switch on" id="toggle-legend" data-setting="legend"></button>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Bar Countdown</span>
+              <button class="toggle-switch on" id="toggle-countdown" data-setting="countdown"></button>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Crosshair Mode</span>
+              <select class="settings-select" id="select-crosshair">
+                <option value="magnet">Magnet</option>
+                <option value="normal">Normal</option>
+                <option value="hidden">Hidden</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scale Tab -->
+        <div class="tab-content" data-tab-content="scale">
+          <div class="settings-section">
+            <div class="settings-row">
+              <span class="settings-label">Auto Scale</span>
+              <button class="toggle-switch on" id="toggle-autoscale" data-setting="autoscale"></button>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Log Scale</span>
+              <button class="toggle-switch" id="toggle-logscale" data-setting="logscale"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="reset-link" id="settings-reset">Reset to defaults</button>
+        <button class="done-btn" id="settings-done">Done</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Features ──────────────────────────────────────────────────── -->
   <section class="features-section">
