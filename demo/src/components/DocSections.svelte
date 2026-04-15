@@ -97,6 +97,7 @@
     <a class="docs-sidebar-link" href="#events">Events</a>
     <a class="docs-sidebar-link" href="#state">Save / Load</a>
     <a class="docs-sidebar-link" href="#api">API Reference</a>
+    <a class="docs-sidebar-link" href="#changelog">Changelog</a>
   </nav>
   <div class="docs-content">
 
@@ -973,6 +974,100 @@ chart.<span class="fn">exportAllData</span>(<span class="str">'json'</span>)</pr
     </div>
   </section>
 
+  <!-- Changelog -->
+  <section class="doc-section" id="changelog">
+    <h2 class="section-title">Changelog</h2>
+    <p class="section-subtitle">Release history for @tradecanvas/chart.</p>
+
+    <div class="changelog">
+      <div class="changelog-version">
+        <h3>0.1.3 <span class="changelog-date">2026-04-15</span></h3>
+        <div class="changelog-group">
+          <h4>Bug Fixes</h4>
+          <ul>
+            <li>Panel indicators not rendering until chart interaction</li>
+            <li>Stop orders showing LIMIT label instead of STOP</li>
+            <li>npm publish with <code>workspace:*</code> deps — now using <code>pnpm publish</code></li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>Features</h4>
+          <ul>
+            <li>Auto-scale includes overlay indicator values (Bollinger, Ichimoku, Keltner)</li>
+            <li>TC prefix on all generated IDs to prevent collisions</li>
+            <li>Trade-on-chart via built-in right-click context menu</li>
+            <li>Client-side order matching engine with spread and commission</li>
+            <li>Trade history with win rate and PnL stats</li>
+            <li>Toast notifications for order fills and SL/TP triggers</li>
+            <li><code>Viewport.setPriceRange()</code> — direct price range control</li>
+            <li><code>IndicatorEngine.getOverlayPriceRange()</code> — overlay min/max</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="changelog-version">
+        <h3>0.1.2 <span class="changelog-date">2026-04-15</span></h3>
+        <div class="changelog-group">
+          <h4>Features</h4>
+          <ul>
+            <li>Svelte 5 demo site with TradingView-style UI</li>
+            <li>Developer documentation (11 guide sections)</li>
+            <li>StackBlitz sandboxes for Vanilla JS, React, Svelte, Vue</li>
+            <li>Paper trading panel with balance and PnL tracking</li>
+            <li>Replay button (play/pause/stop) in toolbar</li>
+            <li>npm/pnpm/yarn package manager switcher</li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>Examples</h4>
+          <ul>
+            <li>Updated basic and vanilla-static examples with modern UI</li>
+            <li>Added Svelte 5 example (<code>examples/svelte</code>)</li>
+            <li>Added Vue 3 example (<code>examples/vue</code>)</li>
+            <li>Updated React example with improved controls</li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>Documentation</h4>
+          <ul>
+            <li>Per-package READMEs for npm pages</li>
+            <li>Svelte and Vue framework integration guides in README</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="changelog-version">
+        <h3>0.1.1 <span class="changelog-date">2026-04-15</span></h3>
+        <div class="changelog-group">
+          <h4>Bug Fixes</h4>
+          <ul>
+            <li>Fix repository URLs pointing to wrong GitHub repo</li>
+            <li>Fix all TypeScript declaration errors</li>
+            <li>Fix volume type mismatch in DataManager</li>
+            <li>Add <code>publishConfig.access: "public"</code> for scoped packages</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="changelog-version">
+        <h3>0.1.0 <span class="changelog-date">2026-04-09</span></h3>
+        <div class="changelog-group">
+          <h4>Initial Release</h4>
+          <ul>
+            <li>11 chart types (Candlestick, Line, Area, Heikin-Ashi, Renko, Kagi, ...)</li>
+            <li>26 built-in indicators (SMA, EMA, RSI, MACD, Bollinger, Ichimoku, ...)</li>
+            <li>23 drawing tools with magnet snapping and undo/redo</li>
+            <li>Trading overlay with positions, orders, drag-to-modify SL/TP</li>
+            <li>Real-time streaming with built-in Binance adapter</li>
+            <li>Save/load chart state, replay mode, screenshots</li>
+            <li>Multi-layer canvas rendering, dark/light themes, i18n</li>
+            <li>Zero external dependencies</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
   </div><!-- /.docs-content -->
 </div><!-- /.docs-layout -->
 
@@ -1350,5 +1445,76 @@ chart.<span class="fn">exportAllData</span>(<span class="str">'json'</span>)</pr
     :global(.sandbox-cards-grid) {
       grid-template-columns: 1fr;
     }
+  }
+
+  /* Changelog */
+  .changelog-version {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .changelog-version:last-child {
+    border-bottom: none;
+  }
+
+  .changelog-version h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .changelog-date {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+
+  .changelog-group {
+    margin-bottom: 12px;
+  }
+
+  .changelog-group h4 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .changelog-group ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .changelog-group li {
+    position: relative;
+    padding: 3px 0 3px 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .changelog-group li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  .changelog-group li code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(59, 130, 246, 0.08);
+    padding: 1px 4px;
+    border-radius: 3px;
   }
 </style>
