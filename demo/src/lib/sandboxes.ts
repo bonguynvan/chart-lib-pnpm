@@ -1,6 +1,6 @@
 import sdk from '@stackblitz/sdk';
 
-const CHART_VERSION = '^0.1.2';
+const CHART_VERSION = '^0.1.3';
 
 const BODY_CSS = 'body { margin: 0; background: #131722; }';
 
@@ -75,7 +75,7 @@ export function openVanillaSandbox(): void {
           "chart.connect({ adapter, symbol: 'BTCUSDT', timeframe: '5m' });",
           '',
           '// Add an SMA indicator',
-          "chart.addIndicator({ type: 'sma', period: 20 });",
+          "chart.addIndicator('sma', { period: 20 });",
         ].join('\n'),
       },
     },
@@ -187,7 +187,7 @@ export function openReactSandbox(): void {
           '',
           '    const adapter = new BinanceAdapter();',
           "    chart.connect({ adapter, symbol: 'BTCUSDT', timeframe: '5m' });",
-          "    chart.addIndicator({ type: 'sma', period: 20 });",
+          "    chart.addIndicator('sma', { period: 20 });",
           '',
           '    return () => chart.destroy();',
           '  }, []);',
@@ -275,11 +275,10 @@ export function openSvelteSandbox(): void {
           '</html>',
         ].join('\n'),
         'src/main.ts': [
+          "import { mount } from 'svelte';",
           "import App from './App.svelte';",
           '',
-          "const app = new App({ target: document.getElementById('app')! });",
-          '',
-          'export default app;',
+          "mount(App, { target: document.getElementById('app')! });",
         ].join('\n'),
         'src/App.svelte': [
           '<script lang="ts">',
@@ -306,7 +305,7 @@ export function openSvelteSandbox(): void {
           '',
           '    const adapter = new BinanceAdapter();',
           "    chart.connect({ adapter, symbol: 'BTCUSDT', timeframe: '5m' });",
-          "    chart.addIndicator({ type: 'sma', period: 20 });",
+          "    chart.addIndicator('sma', { period: 20 });",
           '  });',
           '',
           '  onDestroy(() => chart?.destroy());',
@@ -427,7 +426,7 @@ export function openVueSandbox(): void {
           '',
           '  const adapter = new BinanceAdapter();',
           "  chart.connect({ adapter, symbol: 'BTCUSDT', timeframe: '5m' });",
-          "  chart.addIndicator({ type: 'sma', period: 20 });",
+          "  chart.addIndicator('sma', { period: 20 });",
           '});',
           '',
           'onUnmounted(() => chart?.destroy());',
