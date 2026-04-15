@@ -7,6 +7,7 @@ on:
       - 'packages/**'
       - 'docs/**'
       - '.github/workflows/deploy-demo.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -18,8 +19,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -32,19 +36,15 @@ jobs:
           node-version: 18
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - run: pnpm install --no-frozen-lockfile
+
+      - run: pnpm -r --filter @tradecanvas/commons --filter @tradecanvas/core --filter @tradecanvas/chart --filter @tradecanvas/demo build
+
+      - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
