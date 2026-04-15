@@ -12,6 +12,7 @@
   import DrawToolsSidebar from './DrawToolsSidebar.svelte';
   import ChartSettings from './ChartSettings.svelte';
   import TradingPanel from './TradingPanel.svelte';
+  import TradeToast from './TradeToast.svelte';
   import { DEFAULT_SETTINGS } from '../lib/chartSettings';
   import type { ChartSettingsState } from '../lib/chartSettings';
 
@@ -36,7 +37,8 @@
   let positionCount = $state(0);
   let tradingTotalPnl = $state(0);
 
-  // Context menu state
+  // Toast component
+  let tradeToast: TradeToast | undefined = $state();
 
   // Connection status
   let statusState: 'connecting' | 'connected' | 'error' = $state('connecting');
@@ -96,12 +98,16 @@
       const bar = e.payload?.bar;
       if (bar && bar.close > 0) {
         currentPrice = bar.close;
+        tradingPanel?.tick(bar.close);
       }
     });
 
     // Listen for data updates to keep current price fresh
     chart.on('dataUpdate', () => {
       updateCurrentPriceFromLastBar();
+      if (currentPrice > 0) {
+        tradingPanel?.tick(currentPrice);
+      }
     });
 
     // Handle order drag events from chart
@@ -342,6 +348,10 @@
     tradingOpen = false;
   }
 
+  function handleTradeToast(message: string, detail: string, type: 'fill-buy' | 'fill-sell' | 'sl' | 'tp'): void {
+    tradeToast?.addToast({ message, detail, type });
+  }
+
   function syncTradingState(): void {
     if (tradingPanel) {
       positionCount = tradingPanel.getPositionCount();
@@ -439,7 +449,10 @@
       onClose={handleTradingClose}
       onPositionsChange={handlePositionsChangeWrapped}
       onOrdersChange={handleOrdersChangeWrapped}
+      onToast={handleTradeToast}
     />
+
+    <TradeToast bind:this={tradeToast} />
 
     <div class="chart-status">
       <div class="status-indicator">

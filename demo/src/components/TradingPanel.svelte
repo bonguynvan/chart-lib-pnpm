@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { TradingPosition, TradingOrder, OrderSide } from '@tradecanvas/chart';
-  import { X, RefreshCw } from 'lucide-svelte';
+  import { X, RefreshCw, Clock } from 'lucide-svelte';
+  import { OrderMatcher } from '../lib/orderMatcher';
+  import type { FillEvent, StopOutEvent } from '../lib/orderMatcher';
+  import { TradeHistory } from '../lib/tradeHistory';
+  import type { TradeRecord, TradeStats } from '../lib/tradeHistory';
 
   const STORAGE_BALANCE = 'tc-demo-balance';
   const STORAGE_POSITIONS = 'tc-demo-positions';
@@ -14,13 +18,30 @@
     onClose: () => void;
     onPositionsChange: (positions: TradingPosition[]) => void;
     onOrdersChange: (orders: TradingOrder[]) => void;
+    onToast?: (message: string, detail: string, type: 'fill-buy' | 'fill-sell' | 'sl' | 'tp') => void;
   }
 
-  let { currentPrice, symbol, open, onClose, onPositionsChange, onOrdersChange }: Props = $props();
+  let { currentPrice, symbol, open, onClose, onPositionsChange, onOrdersChange, onToast }: Props = $props();
   let balance = $state(INITIAL_BALANCE);
   let positions: TradingPosition[] = $state([]);
   let orders: TradingOrder[] = $state([]);
   let nextId = $state(1);
+
+  // Tabs
+  let activeTab: 'trading' | 'history' = $state('trading');
+
+  // Order matcher and trade history
+  const matcher = new OrderMatcher();
+  const history = new TradeHistory();
+  const matcherConfig = matcher.getConfig();
+
+  let historyStats: TradeStats = $state(history.getStats());
+  let recentTrades: TradeRecord[] = $state(history.getRecent(20));
+
+  function refreshHistory(): void {
+    historyStats = history.getStats();
+    recentTrades = history.getRecent(20);
+  }
 
   // Load from localStorage on init
   function loadState(): void {
@@ -112,6 +133,20 @@
     if (pos) {
       const pnl = computePnl(pos);
       balance = parseFloat((balance + pnl).toFixed(2));
+
+      history.add({
+        id: `trade-${Date.now()}`,
+        type: 'manual_close',
+        side: pos.side,
+        entryPrice: pos.entryPrice,
+        exitPrice: currentPrice,
+        quantity: pos.quantity,
+        pnl,
+        commission: 0,
+        timestamp: Date.now(),
+        symbol,
+      });
+      refreshHistory();
     }
     positions = positions.filter(p => p.id !== posId);
     saveState();
@@ -129,6 +164,8 @@
     positions = [];
     orders = [];
     nextId = 1;
+    history.clear();
+    refreshHistory();
     saveState();
     onPositionsChange(positions);
     onOrdersChange(orders);
@@ -143,10 +180,9 @@
 
   function computePnlPercent(pos: TradingPosition): number {
     if (pos.entryPrice <= 0) return 0;
-    const raw = pos.side === 'buy'
+    return pos.side === 'buy'
       ? ((currentPrice - pos.entryPrice) / pos.entryPrice) * 100
       : ((pos.entryPrice - currentPrice) / pos.entryPrice) * 100;
-    return raw;
   }
 
   const totalPnl = $derived(
@@ -169,6 +205,106 @@
 
   function formatPrice(v: number): string {
     return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function formatTime(ts: number): string {
+    const d = new Date(ts);
+    return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  }
+
+  // --- Order Matching ---
+
+  function processFill(fill: FillEvent): void {
+    // Remove the filled order
+    orders = orders.filter(o => o.id !== fill.orderId);
+
+    // Create a new position at fill price
+    const slMultiplier = fill.side === 'buy' ? 0.98 : 1.02;
+    const tpMultiplier = fill.side === 'buy' ? 1.04 : 0.96;
+
+    const newPos: TradingPosition = {
+      id: generateId('tc-pos'),
+      side: fill.side,
+      entryPrice: fill.fillPrice,
+      quantity: fill.quantity,
+      stopLoss: parseFloat((fill.fillPrice * slMultiplier).toFixed(2)),
+      takeProfit: parseFloat((fill.fillPrice * tpMultiplier).toFixed(2)),
+    };
+
+    positions = [...positions, newPos];
+    balance = parseFloat((balance - fill.commission).toFixed(2));
+
+    history.add({
+      id: `trade-${Date.now()}-${fill.orderId}`,
+      type: 'fill',
+      side: fill.side,
+      entryPrice: fill.fillPrice,
+      quantity: fill.quantity,
+      commission: fill.commission,
+      timestamp: fill.timestamp,
+      symbol,
+    });
+
+    onToast?.(
+      `${fill.side === 'buy' ? 'Buy' : 'Sell'} ${fill.type.charAt(0).toUpperCase() + fill.type.slice(1)} Filled`,
+      `${fill.quantity} @ ${formatPrice(fill.fillPrice)} | Commission: $${fill.commission.toFixed(2)}`,
+      fill.side === 'buy' ? 'fill-buy' : 'fill-sell',
+    );
+  }
+
+  function processStopOut(stopOut: StopOutEvent): void {
+    // Remove the closed position
+    positions = positions.filter(p => p.id !== stopOut.positionId);
+
+    const commission = Math.abs(stopOut.exitPrice * stopOut.quantity * matcherConfig.commissionPercent / 100);
+    const netPnl = stopOut.pnl - commission;
+    balance = parseFloat((balance + netPnl).toFixed(2));
+
+    const recordType = stopOut.reason === 'stopLoss' ? 'stopLoss' : 'takeProfit';
+
+    history.add({
+      id: `trade-${Date.now()}-${stopOut.positionId}`,
+      type: recordType,
+      side: stopOut.side,
+      entryPrice: stopOut.entryPrice,
+      exitPrice: stopOut.exitPrice,
+      quantity: stopOut.quantity,
+      pnl: netPnl,
+      commission,
+      timestamp: Date.now(),
+      symbol,
+    });
+
+    const label = stopOut.reason === 'stopLoss' ? 'Stop Loss Hit' : 'Take Profit Hit';
+    const toastType = stopOut.reason === 'stopLoss' ? 'sl' : 'tp';
+
+    onToast?.(
+      `${stopOut.side === 'buy' ? 'Long' : 'Short'} ${label}`,
+      `Exit @ ${formatPrice(stopOut.exitPrice)} | PnL: ${formatUsd(netPnl)}`,
+      toastType as 'sl' | 'tp',
+    );
+  }
+
+  // Public tick method: called by parent on every price update
+  export function tick(price: number): void {
+    if (price <= 0 || (orders.length === 0 && positions.length === 0)) return;
+
+    const { fills, stopOuts } = matcher.tick(price, orders, positions);
+
+    if (fills.length === 0 && stopOuts.length === 0) return;
+
+    for (const fill of fills) {
+      processFill(fill);
+    }
+
+    for (const stopOut of stopOuts) {
+      processStopOut(stopOut);
+    }
+
+    refreshHistory();
+    saveState();
+    onPositionsChange(positions);
+    onOrdersChange(orders);
   }
 
   // Public method-like: update an order price (called from parent on orderModify event)
@@ -251,78 +387,152 @@
         <span class="header-title">Paper Trading</span>
         <span class="header-balance">${formatPrice(balance)}</span>
       </div>
-      <button class="btn-close-popup" title="Close" onclick={onClose}>
-        <X size={14} />
+      <div class="header-right">
+        <span class="header-config">Spread: {matcherConfig.spreadPercent}% | Comm: {matcherConfig.commissionPercent}%</span>
+        <button class="btn-close-popup" title="Close" onclick={onClose}>
+          <X size={14} />
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn" class:active={activeTab === 'trading'} onclick={() => activeTab = 'trading'}>
+        Trading
+      </button>
+      <button class="tab-btn" class:active={activeTab === 'history'} onclick={() => activeTab = 'history'}>
+        <Clock size={10} />
+        History
+        {#if historyStats.totalTrades > 0}
+          <span class="tab-badge">{historyStats.totalTrades}</span>
+        {/if}
       </button>
     </div>
-    {#if totalPnl !== 0}
-      <div class="popup-pnl" class:profit={totalPnl >= 0} class:loss={totalPnl < 0}>
-        PnL: {formatUsd(totalPnl)} ({formatPercent(totalPnlPercent)})
+
+    {#if activeTab === 'trading'}
+      {#if totalPnl !== 0}
+        <div class="popup-pnl" class:profit={totalPnl >= 0} class:loss={totalPnl < 0}>
+          PnL: {formatUsd(totalPnl)} ({formatPercent(totalPnlPercent)})
+        </div>
+      {/if}
+
+      <div class="trading-content">
+        <div class="trading-actions">
+          <div class="action-group">
+            <button class="btn-buy" onclick={() => openPosition('buy')}>Buy / Long</button>
+            <button class="btn-limit-buy" onclick={() => placeLimitOrder('buy')}>Limit</button>
+          </div>
+          <div class="action-group">
+            <button class="btn-sell" onclick={() => openPosition('sell')}>Sell / Short</button>
+            <button class="btn-limit-sell" onclick={() => placeLimitOrder('sell')}>Limit</button>
+          </div>
+          <div class="action-group action-right">
+            <span class="current-price">{formatPrice(currentPrice)}</span>
+            <button class="btn-reset" title="Reset all" onclick={resetAll}>
+              <RefreshCw size={12} />
+            </button>
+          </div>
+        </div>
+
+        {#if positions.length > 0}
+          <div class="section-label">Positions</div>
+          <div class="list">
+            {#each positions as pos (pos.id)}
+              {@const pnl = computePnl(pos)}
+              {@const pnlPct = computePnlPercent(pos)}
+              <div class="row">
+                <span class="side-tag" class:buy={pos.side === 'buy'} class:sell={pos.side === 'sell'}>
+                  {pos.side === 'buy' ? 'LONG' : 'SHORT'}
+                </span>
+                <span class="mono">{pos.quantity}</span>
+                <span class="dim">@</span>
+                <span class="mono">{formatPrice(pos.entryPrice)}</span>
+                <span class="spacer"></span>
+                <span class="pnl-val" class:profit={pnl >= 0} class:loss={pnl < 0}>
+                  {formatUsd(pnl)} ({formatPercent(pnlPct)})
+                </span>
+                <button class="btn-close" title="Close position" onclick={() => closePosition(pos.id)}>
+                  <X size={10} />
+                </button>
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        {#if orders.length > 0}
+          <div class="section-label">Orders</div>
+          <div class="list">
+            {#each orders as ord (ord.id)}
+              <div class="row">
+                <span class="side-tag" class:buy={ord.side === 'buy'} class:sell={ord.side === 'sell'}>
+                  {ord.side === 'buy' ? 'BUY' : 'SELL'}
+                </span>
+                <span class="order-type">{ord.type.toUpperCase()}</span>
+                <span class="mono">{ord.quantity}</span>
+                <span class="dim">@</span>
+                <span class="mono">{formatPrice(ord.price)}</span>
+                <span class="spacer"></span>
+                <button class="btn-cancel" onclick={() => cancelOrder(ord.id)}>Cancel</button>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {:else}
+      <!-- History Tab -->
+      <div class="trading-content">
+        {#if historyStats.totalTrades > 0}
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Trades</span>
+              <span class="stat-value">{historyStats.totalTrades}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Win Rate</span>
+              <span class="stat-value">{historyStats.winRate.toFixed(1)}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Total PnL</span>
+              <span class="stat-value" class:profit={historyStats.totalPnl >= 0} class:loss={historyStats.totalPnl < 0}>
+                {formatUsd(historyStats.totalPnl)}
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Commission</span>
+              <span class="stat-value dim">-${historyStats.totalCommission.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div class="section-label">Recent Trades</div>
+          <div class="list">
+            {#each recentTrades as trade (trade.id)}
+              <div class="row history-row">
+                <span class="trade-time">{formatTime(trade.timestamp)}</span>
+                <span class="side-tag" class:buy={trade.side === 'buy'} class:sell={trade.side === 'sell'}>
+                  {trade.side === 'buy' ? 'BUY' : 'SELL'}
+                </span>
+                <span class="trade-type-label">{trade.type === 'stopLoss' ? 'SL' : trade.type === 'takeProfit' ? 'TP' : trade.type === 'manual_close' ? 'CLOSE' : 'FILL'}</span>
+                <span class="mono">{formatPrice(trade.entryPrice)}</span>
+                {#if trade.exitPrice}
+                  <span class="dim">-></span>
+                  <span class="mono">{formatPrice(trade.exitPrice)}</span>
+                {/if}
+                <span class="spacer"></span>
+                {#if trade.pnl !== undefined}
+                  <span class="pnl-val" class:profit={trade.pnl >= 0} class:loss={trade.pnl < 0}>
+                    {formatUsd(trade.pnl)}
+                  </span>
+                {/if}
+                {#if trade.commission > 0}
+                  <span class="commission-val">-${trade.commission.toFixed(2)}</span>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <div class="empty-state">No trades yet</div>
+        {/if}
       </div>
     {/if}
-
-    <div class="trading-content">
-      <div class="trading-actions">
-        <div class="action-group">
-          <button class="btn-buy" onclick={() => openPosition('buy')}>Buy / Long</button>
-          <button class="btn-limit-buy" onclick={() => placeLimitOrder('buy')}>Limit</button>
-        </div>
-        <div class="action-group">
-          <button class="btn-sell" onclick={() => openPosition('sell')}>Sell / Short</button>
-          <button class="btn-limit-sell" onclick={() => placeLimitOrder('sell')}>Limit</button>
-        </div>
-        <div class="action-group action-right">
-          <span class="current-price">{formatPrice(currentPrice)}</span>
-          <button class="btn-reset" title="Reset all" onclick={resetAll}>
-            <RefreshCw size={12} />
-          </button>
-        </div>
-      </div>
-
-      {#if positions.length > 0}
-        <div class="section-label">Positions</div>
-        <div class="list">
-          {#each positions as pos (pos.id)}
-            {@const pnl = computePnl(pos)}
-            {@const pnlPct = computePnlPercent(pos)}
-            <div class="row">
-              <span class="side-tag" class:buy={pos.side === 'buy'} class:sell={pos.side === 'sell'}>
-                {pos.side === 'buy' ? 'LONG' : 'SHORT'}
-              </span>
-              <span class="mono">{pos.quantity}</span>
-              <span class="dim">@</span>
-              <span class="mono">{formatPrice(pos.entryPrice)}</span>
-              <span class="spacer"></span>
-              <span class="pnl-val" class:profit={pnl >= 0} class:loss={pnl < 0}>
-                {formatUsd(pnl)} ({formatPercent(pnlPct)})
-              </span>
-              <button class="btn-close" title="Close position" onclick={() => closePosition(pos.id)}>
-                <X size={10} />
-              </button>
-            </div>
-          {/each}
-        </div>
-      {/if}
-
-      {#if orders.length > 0}
-        <div class="section-label">Orders</div>
-        <div class="list">
-          {#each orders as ord (ord.id)}
-            <div class="row">
-              <span class="side-tag" class:buy={ord.side === 'buy'} class:sell={ord.side === 'sell'}>
-                {ord.side === 'buy' ? 'BUY' : 'SELL'}
-              </span>
-              <span class="order-type">{ord.type.toUpperCase()}</span>
-              <span class="mono">{ord.quantity}</span>
-              <span class="dim">@</span>
-              <span class="mono">{formatPrice(ord.price)}</span>
-              <span class="spacer"></span>
-              <button class="btn-cancel" onclick={() => cancelOrder(ord.id)}>Cancel</button>
-            </div>
-          {/each}
-        </div>
-      {/if}
-    </div>
   </div>
 {/if}
 
@@ -331,8 +541,8 @@
     position: absolute;
     top: 44px;
     right: 8px;
-    width: 360px;
-    max-height: 400px;
+    width: 380px;
+    max-height: 440px;
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -358,6 +568,12 @@
     gap: 10px;
   }
 
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .header-title {
     font-size: 12px;
     font-weight: 700;
@@ -370,6 +586,13 @@
     font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
     font-size: 12px;
     color: var(--text-muted);
+  }
+
+  .header-config {
+    font-size: 9px;
+    color: var(--text-muted);
+    opacity: 0.7;
+    white-space: nowrap;
   }
 
   .btn-close-popup {
@@ -393,6 +616,56 @@
 
   :global(body.light) .btn-close-popup:hover {
     background: rgba(0, 0, 0, 0.04);
+  }
+
+  .tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .tab-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  :global(body.light) .tab-btn:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent, #3b82f6);
+  }
+
+  .tab-badge {
+    font-size: 9px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 1px 5px;
+    border-radius: 8px;
+    color: var(--text-muted);
+  }
+
+  :global(body.light) .tab-badge {
+    background: rgba(0, 0, 0, 0.06);
   }
 
   .popup-pnl {
@@ -613,5 +886,81 @@
   .btn-cancel:hover {
     border-color: var(--red);
     color: var(--red);
+  }
+
+  /* History tab styles */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  :global(body.light) .stat-item {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.06);
+  }
+
+  .stat-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .stat-value.profit { color: var(--green); }
+  .stat-value.loss { color: var(--red); }
+  .stat-value.dim { color: var(--text-muted); }
+
+  .history-row {
+    flex-wrap: wrap;
+  }
+
+  .trade-time {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    min-width: 55px;
+  }
+
+  .trade-type-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .commission-val {
+    font-size: 9px;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    color: var(--text-muted);
+    opacity: 0.7;
+  }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
   }
 </style>

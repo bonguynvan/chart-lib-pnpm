@@ -672,6 +672,84 @@ chart.<span class="fn">setTradingConfig</span>({'{'}
 {'}'})</pre>
       </div>
     </div>
+
+    <h3>Order Matching (Reference Implementation)</h3>
+    <p class="doc-text">The chart library renders positions and orders but does not include a matching engine. Here is a reference implementation for matching pending orders against live price ticks on the client side.</p>
+    <div class="code-block">
+      <div class="code-header"><span>Order matching on price tick</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="cmt">// Simple order matching on price tick</span>
+<span class="kw">function</span> <span class="fn">checkOrders</span>(price: <span class="kw">number</span>, orders: TradingOrder[]) {'{'}
+  <span class="kw">for</span> (<span class="kw">const</span> order <span class="kw">of</span> orders) {'{'}
+    <span class="kw">const</span> filled =
+      (order.type === <span class="str">'limit'</span> &amp;&amp; order.side === <span class="str">'buy'</span> &amp;&amp; price &lt;= order.price) ||
+      (order.type === <span class="str">'limit'</span> &amp;&amp; order.side === <span class="str">'sell'</span> &amp;&amp; price &gt;= order.price) ||
+      (order.type === <span class="str">'stop'</span> &amp;&amp; order.side === <span class="str">'buy'</span> &amp;&amp; price &gt;= order.price) ||
+      (order.type === <span class="str">'stop'</span> &amp;&amp; order.side === <span class="str">'sell'</span> &amp;&amp; price &lt;= order.price);
+
+    <span class="kw">if</span> (filled) {'{'}
+      <span class="cmt">// Remove order, create position</span>
+      chart.<span class="fn">setOrders</span>(orders.<span class="fn">filter</span>(o =&gt; o.id !== order.id));
+      chart.<span class="fn">setPositions</span>([...positions, {'{'}
+        id: <span class="str">`pos-${'$'}{'{'}Date.now(){'}'}`</span>,
+        side: order.side,
+        entryPrice: order.price,
+        quantity: order.quantity,
+        stopLoss: order.side === <span class="str">'buy'</span> ? order.price * <span class="bool">0.98</span> : order.price * <span class="bool">1.02</span>,
+        takeProfit: order.side === <span class="str">'buy'</span> ? order.price * <span class="bool">1.04</span> : order.price * <span class="bool">0.96</span>,
+      {'}'}]);
+    {'}'}
+  {'}'}
+{'}'}
+
+<span class="cmt">// Check SL/TP on positions</span>
+<span class="kw">function</span> <span class="fn">checkStopLoss</span>(price: <span class="kw">number</span>, positions: TradingPosition[]) {'{'}
+  <span class="kw">for</span> (<span class="kw">const</span> pos <span class="kw">of</span> positions) {'{'}
+    <span class="kw">const</span> hitSL = pos.stopLoss &amp;&amp; (
+      (pos.side === <span class="str">'buy'</span> &amp;&amp; price &lt;= pos.stopLoss) ||
+      (pos.side === <span class="str">'sell'</span> &amp;&amp; price &gt;= pos.stopLoss)
+    );
+    <span class="kw">const</span> hitTP = pos.takeProfit &amp;&amp; (
+      (pos.side === <span class="str">'buy'</span> &amp;&amp; price &gt;= pos.takeProfit) ||
+      (pos.side === <span class="str">'sell'</span> &amp;&amp; price &lt;= pos.takeProfit)
+    );
+
+    <span class="kw">if</span> (hitSL || hitTP) {'{'}
+      <span class="cmt">// Close position, calculate PnL</span>
+      <span class="kw">const</span> pnl = pos.side === <span class="str">'buy'</span>
+        ? (price - pos.entryPrice) * pos.quantity
+        : (pos.entryPrice - price) * pos.quantity;
+      chart.<span class="fn">setPositions</span>(positions.<span class="fn">filter</span>(p =&gt; p.id !== pos.id));
+    {'}'}
+  {'}'}
+{'}'}
+
+<span class="cmt">// Wire to chart events</span>
+chart.<span class="fn">on</span>(<span class="str">'crosshairMove'</span>, (e) =&gt; {'{'}
+  <span class="kw">const</span> price = e.payload.bar?.close;
+  <span class="kw">if</span> (price) {'{'}
+    <span class="fn">checkOrders</span>(price, currentOrders);
+    <span class="fn">checkStopLoss</span>(price, currentPositions);
+  {'}'}
+{'}'});</pre>
+      </div>
+    </div>
+
+    <h3>Spread and Commission</h3>
+    <p class="doc-text">For realistic paper trading, apply a spread to the fill price and calculate a commission on each trade.</p>
+    <div class="code-block">
+      <div class="code-header"><span>Spread and commission calculation</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="cmt">// Calculate fill price with spread</span>
+<span class="kw">const</span> spread = <span class="bool">0.05</span>; <span class="cmt">// 0.05%</span>
+<span class="kw">const</span> fillPrice = side === <span class="str">'buy'</span>
+  ? requestedPrice * (<span class="bool">1</span> + spread / <span class="bool">100</span>)
+  : requestedPrice * (<span class="bool">1</span> - spread / <span class="bool">100</span>);
+
+<span class="cmt">// Calculate commission</span>
+<span class="kw">const</span> commission = fillPrice * quantity * <span class="bool">0.1</span> / <span class="bool">100</span>; <span class="cmt">// 0.1%</span></pre>
+      </div>
+    </div>
   </section>
 
   <!-- Features Config -->
