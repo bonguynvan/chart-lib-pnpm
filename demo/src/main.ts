@@ -700,6 +700,127 @@ copyCodeBtn.addEventListener('click', async () => {
   }
 });
 
+// ─── Doc Nav: show/hide sticky nav on scroll ─────────────────────────────
+
+const docNav = document.getElementById('doc-nav');
+const docSections = document.querySelectorAll('.doc-section');
+const docNavLinks = document.querySelectorAll<HTMLAnchorElement>('.doc-nav-link');
+
+// Show the doc-nav once the user scrolls past the quickstart section.
+const quickstartSection = document.querySelector('.quickstart-section');
+
+if (docNav && quickstartSection) {
+  const navObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          docNav.classList.add('visible');
+        } else {
+          docNav.classList.remove('visible');
+        }
+      }
+    },
+    { rootMargin: '0px', threshold: 0 },
+  );
+  navObserver.observe(quickstartSection);
+}
+
+// ─── Doc Nav: active section highlight ────────────────────────────────────
+
+if (docSections.length > 0 && docNavLinks.length > 0) {
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const id = (entry.target as HTMLElement).id;
+          docNavLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+          });
+        }
+      }
+    },
+    { rootMargin: '-20% 0px -60% 0px', threshold: 0 },
+  );
+  docSections.forEach(section => sectionObserver.observe(section));
+}
+
+// ─── Doc Nav: smooth anchor scrolling ─────────────────────────────────────
+
+docNavLinks.forEach(link => {
+  link.addEventListener('click', (e: Event) => {
+    e.preventDefault();
+    const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+    if (!href) return;
+    const target = document.querySelector(href);
+    if (target) {
+      const navHeight = docNav?.offsetHeight ?? 0;
+      const y = target.getBoundingClientRect().top + window.scrollY - navHeight - 12;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  });
+});
+
+// ─── Tab switching for code blocks ────────────────────────────────────────
+
+document.querySelectorAll<HTMLElement>('[data-tabs]').forEach(tabContainer => {
+  const buttons = tabContainer.querySelectorAll<HTMLButtonElement>('.code-tab-btn');
+  const panels = tabContainer.querySelectorAll<HTMLElement>('.code-tab-panel');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.tabTarget;
+      if (!targetId) return;
+
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      panels.forEach(p => {
+        p.classList.toggle('active', p.id === targetId);
+      });
+    });
+  });
+});
+
+// ─── Copy buttons for all doc code blocks ─────────────────────────────────
+
+function getCodeTextFromBlock(btn: HTMLElement): string {
+  const container = btn.closest('.code-tabs') ?? btn.closest('.code-block');
+  if (!container) return '';
+
+  let codeBody: HTMLElement | null;
+  if (container.classList.contains('code-tabs')) {
+    const activePanel = container.querySelector('.code-tab-panel.active');
+    codeBody = activePanel?.querySelector('.code-body') ?? null;
+  } else {
+    codeBody = container.querySelector('.code-body');
+  }
+
+  if (!codeBody) return '';
+  const pre = codeBody.querySelector('pre');
+  return pre?.textContent ?? '';
+}
+
+function handleCopyClick(btn: HTMLElement): void {
+  const text = getCodeTextFromBlock(btn);
+  if (!text) return;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Clipboard API not available
+  });
+}
+
+document.querySelectorAll<HTMLElement>('[data-copy-block], [data-copy-tabs]').forEach(btn => {
+  btn.addEventListener('click', () => handleCopyClick(btn));
+});
+
 // ─── Boot ──────────────────────────────────────────────────────────────────
 
 connectStream();
