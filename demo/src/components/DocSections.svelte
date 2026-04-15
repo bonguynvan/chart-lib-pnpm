@@ -1,5 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import {
+    openVanillaSandbox,
+    openReactSandbox,
+    openSvelteSandbox,
+    openVueSandbox,
+  } from '../lib/sandboxes';
 
   onMount(() => {
     // Tab switching
@@ -132,6 +138,12 @@ container.style.height = <span class="str">'600px'</span>
 ]
 chart.<span class="fn">setData</span>(bars)</pre>
         </div>
+        <div class="stackblitz-bar">
+          <button class="stackblitz-btn" onclick={openVanillaSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
+        </div>
       </div>
 
       <div class="code-tab-panel" id="tab-react">
@@ -162,6 +174,12 @@ chart.<span class="fn">setData</span>(bars)</pre>
 
   <span class="kw">return</span> &lt;<span class="obj">div</span> ref={'{'}containerRef{'}'} style={'{'}{'{'} width: <span class="str">'100%'</span>, height: <span class="str">'600px'</span> {'}'}{'}'}  /&gt;
 {'}'}</pre>
+        </div>
+        <div class="stackblitz-bar">
+          <button class="stackblitz-btn" onclick={openReactSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
         </div>
       </div>
 
@@ -208,6 +226,12 @@ chart.<span class="fn">setData</span>(bars)</pre>
 
 &lt;<span class="obj">div</span> bind:this={'{'}container{'}'} style=<span class="str">"width: 100%; height: 600px"</span> /&gt;</pre>
         </div>
+        <div class="stackblitz-bar">
+          <button class="stackblitz-btn" onclick={openSvelteSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
+        </div>
       </div>
 
       <div class="code-tab-panel" id="tab-vue">
@@ -240,6 +264,51 @@ chart.<span class="fn">setData</span>(bars)</pre>
 
 <span class="fn">onUnmounted</span>(() =&gt; chart?.<span class="fn">destroy</span>())
 &lt;/<span class="obj">script</span>&gt;</pre>
+        </div>
+        <div class="stackblitz-bar">
+          <button class="stackblitz-btn" onclick={openVueSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Try in StackBlitz -->
+    <div class="sandbox-cards">
+      <h3 class="sandbox-cards-title">Try in StackBlitz</h3>
+      <div class="sandbox-cards-grid">
+        <div class="sandbox-card">
+          <div class="sandbox-card-name">Vanilla JS</div>
+          <p class="sandbox-card-desc">Minimal setup with a live chart</p>
+          <button class="stackblitz-btn" onclick={openVanillaSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
+        </div>
+        <div class="sandbox-card">
+          <div class="sandbox-card-name">React</div>
+          <p class="sandbox-card-desc">Minimal setup with a live chart</p>
+          <button class="stackblitz-btn" onclick={openReactSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
+        </div>
+        <div class="sandbox-card">
+          <div class="sandbox-card-name">Svelte</div>
+          <p class="sandbox-card-desc">Minimal setup with a live chart</p>
+          <button class="stackblitz-btn" onclick={openSvelteSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
+        </div>
+        <div class="sandbox-card">
+          <div class="sandbox-card-name">Vue</div>
+          <p class="sandbox-card-desc">Minimal setup with a live chart</p>
+          <button class="stackblitz-btn" onclick={openVueSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
         </div>
       </div>
     </div>
@@ -1104,6 +1173,92 @@ chart.<span class="fn">exportAllData</span>(<span class="str">'json'</span>)</pr
     border-radius: 3px;
   }
 
+  /* StackBlitz buttons */
+  :global(.stackblitz-bar) {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 16px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  :global(.stackblitz-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #3b82f6;
+    background: transparent;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  :global(.stackblitz-btn:hover) {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border-color: #60a5fa;
+  }
+
+  :global(.stackblitz-btn:active) {
+    background: rgba(59, 130, 246, 0.18);
+  }
+
+  /* Sandbox cards */
+  :global(.sandbox-cards) {
+    margin-top: 48px;
+  }
+
+  :global(.sandbox-cards-title) {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  :global(.sandbox-cards-grid) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  :global(.sandbox-card) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition);
+  }
+
+  :global(.sandbox-card:hover) {
+    border-color: rgba(59, 130, 246, 0.4);
+  }
+
+  :global(.sandbox-card-name) {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  :global(.sandbox-card-desc) {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 900px) {
+    :global(.sandbox-cards-grid) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   @media (max-width: 768px) {
     .docs-layout {
       padding: 0 16px;
@@ -1113,6 +1268,9 @@ chart.<span class="fn">exportAllData</span>(<span class="str">'json'</span>)</pr
     }
     :global(.doc-table) {
       font-size: 12px;
+    }
+    :global(.sandbox-cards-grid) {
+      grid-template-columns: 1fr;
     }
   }
 </style>
