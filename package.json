@@ -9,9 +9,13 @@
     "build": "pnpm -r build",
     "dev": "pnpm -r --parallel dev",
     "clean": "pnpm -r clean",
-    "typecheck": "pnpm -r exec tsc --noEmit"
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.4",
     "typescript": "~5.9.3",
     "vite": "^8.0.1",
     "vite-plugin-dts": "^4.5.4"
