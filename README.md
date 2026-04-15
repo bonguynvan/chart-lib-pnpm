@@ -259,8 +259,10 @@ interface OHLCBar {
 |---|---|
 | [Live Demo](https://bonguynvan.github.io/tradecanvas/) | Full-featured demo with live Binance data |
 | [examples/basic](./examples/basic/) | Vanilla JS + live Binance streaming |
-| [examples/vanilla-static](./examples/vanilla-static/) | Vanilla JS + static data (no network required) |
-| [examples/react](./examples/react/) | React component wrapper with full prop control |
+| [examples/vanilla-static](./examples/vanilla-static/) | Vanilla JS + static data (offline) |
+| [examples/react](./examples/react/) | React 19 integration |
+| [examples/svelte](./examples/svelte/) | Svelte 5 integration |
+| [examples/vue](./examples/vue/) | Vue 3 integration |
 
 ## Browser Support
 

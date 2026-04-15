@@ -8,29 +8,33 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* ── Theme variables ────────────────────────────────────────── */
+/* -- Theme variables ---------------------------------------------------- */
 
 .theme-dark {
   --bg: #0a0a0f;
-  --bg-surface: #12121a;
+  --bg-elevated: #111118;
   --border: #1e1e2e;
   --text: #e1e1e6;
-  --text-muted: #a1a1aa;
+  --text-muted: #6b6b7b;
+  --text-dim: #a1a1aa;
   --accent: #3b82f6;
-  --btn-hover: #1e1e2e;
+  --green: #10b981;
+  --red: #ef4444;
 }
 
 .theme-light {
-  --bg: #f5f5f7;
-  --bg-surface: #ffffff;
-  --border: #d4d4d8;
-  --text: #18181b;
-  --text-muted: #71717a;
+  --bg: #f8f8fa;
+  --bg-elevated: #ffffff;
+  --border: #e0e0e8;
+  --text: #1a1a2e;
+  --text-muted: #8888a0;
+  --text-dim: #555566;
   --accent: #2563eb;
-  --btn-hover: #e4e4e7;
+  --green: #059669;
+  --red: #dc2626;
 }
 
-/* ── Layout ─────────────────────────────────────────────────── */
+/* -- Layout ------------------------------------------------------------- */
 
 .app {
   display: flex;
@@ -43,11 +47,12 @@ body {
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
-  background: var(--bg-surface);
-  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .chart-area {
@@ -55,19 +60,19 @@ body {
   min-height: 0;
 }
 
-/* ── Logo ───────────────────────────────────────────────────── */
+/* -- Logo --------------------------------------------------------------- */
 
 .logo {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
 }
 
-/* ── Select ─────────────────────────────────────────────────── */
+/* -- Select ------------------------------------------------------------- */
 
 .select {
-  padding: 6px 8px;
-  font-size: 11px;
+  padding: 4px 8px;
+  font-size: 12px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--bg);
@@ -80,34 +85,37 @@ body {
   border-color: var(--accent);
 }
 
-/* ── Buttons ────────────────────────────────────────────────── */
+/* -- Buttons ------------------------------------------------------------ */
 
-.button-group {
+.btn-group {
   display: flex;
-  gap: 4px;
+  gap: 2px;
 }
 
 .btn {
-  padding: 6px 12px;
-  font-size: 11px;
-  border: 1px solid var(--border);
+  padding: 4px 8px;
+  font-size: 12px;
+  border: none;
   border-radius: 4px;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-dim);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.12s, color 0.12s;
   white-space: nowrap;
 }
 
 .btn:hover {
-  background: var(--btn-hover);
+  background: rgba(255, 255, 255, 0.06);
   color: var(--text);
+}
+
+.theme-light .btn:hover {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .btn-active {
   background: var(--accent);
   color: #ffffff;
-  border-color: var(--accent);
 }
 
 .btn-active:hover {
@@ -115,37 +123,11 @@ body {
   color: #ffffff;
 }
 
-/* ── Indicator checkboxes ───────────────────────────────────── */
-
-.indicator-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--text-muted);
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox-label input[type='checkbox'] {
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
-.checkbox-label:hover {
-  color: var(--text);
-}
-
-/* ── Separator ──────────────────────────────────────────────── */
+/* -- Separator ---------------------------------------------------------- */
 
 .separator {
   width: 1px;
   height: 20px;
   background: var(--border);
+  flex-shrink: 0;
 }

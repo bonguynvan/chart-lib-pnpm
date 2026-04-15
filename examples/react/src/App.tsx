@@ -9,22 +9,20 @@ const SYMBOLS = [
   { value: 'BNBUSDT', label: 'BNB/USDT' },
 ];
 
-const TIMEFRAMES: TimeFrame[] = ['1m', '5m', '15m', '1h', '4h', '1d'];
-
-const TIMEFRAME_LABELS: Record<string, string> = {
-  '1m': '1m',
-  '5m': '5m',
-  '15m': '15m',
-  '1h': '1H',
-  '4h': '4H',
-  '1d': '1D',
-};
+const TIMEFRAMES: { value: TimeFrame; label: string }[] = [
+  { value: '1m', label: '1m' },
+  { value: '5m', label: '5m' },
+  { value: '15m', label: '15m' },
+  { value: '1h', label: '1H' },
+  { value: '4h', label: '4H' },
+  { value: '1d', label: '1D' },
+];
 
 const CHART_TYPES: { value: ChartType; label: string }[] = [
   { value: 'candlestick', label: 'Candlestick' },
   { value: 'line', label: 'Line' },
   { value: 'area', label: 'Area' },
-  { value: 'bar', label: 'Bar' },
+  { value: 'bar', label: 'Bar (OHLC)' },
   { value: 'heikinAshi', label: 'Heikin Ashi' },
   { value: 'hollowCandle', label: 'Hollow Candle' },
   { value: 'baseline', label: 'Baseline' },
@@ -33,7 +31,7 @@ const CHART_TYPES: { value: ChartType; label: string }[] = [
 const INDICATORS = [
   { id: 'sma', label: 'SMA' },
   { id: 'ema', label: 'EMA' },
-  { id: 'bollinger', label: 'Bollinger' },
+  { id: 'bollinger', label: 'BB' },
   { id: 'rsi', label: 'RSI' },
   { id: 'macd', label: 'MACD' },
 ];
@@ -70,6 +68,7 @@ function App() {
     <div className={`app ${isDark ? 'theme-dark' : 'theme-light'}`}>
       <header className="toolbar">
         <h1 className="logo">TradeCanvas</h1>
+        <div className="separator" />
 
         <select
           className="select"
@@ -83,14 +82,16 @@ function App() {
           ))}
         </select>
 
-        <div className="button-group">
+        <div className="separator" />
+
+        <div className="btn-group">
           {TIMEFRAMES.map((tf) => (
             <button
-              key={tf}
-              className={`btn ${timeframe === tf ? 'btn-active' : ''}`}
-              onClick={() => setTimeframe(tf)}
+              key={tf.value}
+              className={`btn ${timeframe === tf.value ? 'btn-active' : ''}`}
+              onClick={() => setTimeframe(tf.value)}
             >
-              {TIMEFRAME_LABELS[tf] ?? tf}
+              {tf.label}
             </button>
           ))}
         </div>
@@ -111,16 +112,15 @@ function App() {
 
         <div className="separator" />
 
-        <div className="indicator-group">
+        <div className="btn-group">
           {INDICATORS.map((ind) => (
-            <label key={ind.id} className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={activeIndicators.has(ind.id)}
-                onChange={() => toggleIndicator(ind.id)}
-              />
-              <span>{ind.label}</span>
-            </label>
+            <button
+              key={ind.id}
+              className={`btn ${activeIndicators.has(ind.id) ? 'btn-active' : ''}`}
+              onClick={() => toggleIndicator(ind.id)}
+            >
+              {ind.label}
+            </button>
           ))}
         </div>
 
@@ -130,7 +130,7 @@ function App() {
           className="btn"
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
         >
-          {isDark ? 'Light' : 'Dark'}
+          Theme
         </button>
       </header>
 
