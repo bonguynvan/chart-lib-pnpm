@@ -12,7 +12,6 @@
   import DrawToolsSidebar from './DrawToolsSidebar.svelte';
   import ChartSettings from './ChartSettings.svelte';
   import TradingPanel from './TradingPanel.svelte';
-  import TradeContextMenu from './TradeContextMenu.svelte';
   import { DEFAULT_SETTINGS } from '../lib/chartSettings';
   import type { ChartSettingsState } from '../lib/chartSettings';
 
@@ -38,10 +37,6 @@
   let tradingTotalPnl = $state(0);
 
   // Context menu state
-  let contextMenuVisible = $state(false);
-  let contextMenuX = $state(0);
-  let contextMenuY = $state(0);
-  let contextMenuPrice = $state(0);
 
   // Connection status
   let statusState: 'connecting' | 'connected' | 'error' = $state('connecting');
@@ -83,6 +78,7 @@
         drawingUndoRedo: true,
         indicators: true,
         trading: true,
+        tradingContextMenu: true,
         volume: true,
         legend: true,
         crosshair: true,
@@ -122,6 +118,19 @@
       if (positionId && tradingPanel) {
         tradingPanel.updatePositionSlTp(positionId, stopLoss, takeProfit);
       }
+    });
+
+    // Handle built-in context menu order placement
+    chart.on('orderPlace', (e: any) => {
+      const intent = e.payload;
+      if (!intent || !tradingPanel) return;
+      const { side, type, price } = intent;
+      if (type === 'limit' || type === 'stop') {
+        tradingPanel.placeLimitOrderAtPrice(side, price);
+      } else {
+        tradingPanel.openPositionAtPrice(side, price);
+      }
+      syncTradingState();
     });
 
     connectStream();
@@ -350,51 +359,6 @@
     syncTradingState();
   }
 
-  function yToPrice(clientY: number): number {
-    if (!container) return 0;
-    try {
-      const state = (chart as any)?.viewport?.getState?.();
-      if (state) {
-        const { chartRect, priceRange } = state;
-        const containerRect = container.getBoundingClientRect();
-        const relativeY = clientY - containerRect.top;
-        const ratio = (relativeY - chartRect.y) / chartRect.height;
-        return priceRange.max - ratio * (priceRange.max - priceRange.min);
-      }
-    } catch {
-      // fallback
-    }
-    return currentPrice;
-  }
-
-  function handleChartContextMenu(e: MouseEvent): void {
-    e.preventDefault();
-    contextMenuX = e.clientX;
-    contextMenuY = e.clientY;
-    contextMenuPrice = yToPrice(e.clientY);
-    contextMenuVisible = true;
-  }
-
-  function handleContextMenuClose(): void {
-    contextMenuVisible = false;
-  }
-
-  function handleContextBuyMarket(price: number): void {
-    tradingPanel?.openPositionAtPrice('buy', price);
-  }
-
-  function handleContextSellMarket(price: number): void {
-    tradingPanel?.openPositionAtPrice('sell', price);
-  }
-
-  function handleContextBuyLimit(price: number): void {
-    tradingPanel?.placeLimitOrderAtPrice('buy', price);
-  }
-
-  function handleContextSellLimit(price: number): void {
-    tradingPanel?.placeLimitOrderAtPrice('sell', price);
-  }
-
   function applySettings(patch: Partial<ChartSettingsState>) {
     if (!chart) return;
 
@@ -464,8 +428,7 @@
         onRedo={handleRedo}
         onClearDrawings={handleClearDrawings}
       />
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div class="chart-container" bind:this={container} oncontextmenu={handleChartContextMenu}></div>
+      <div class="chart-container" bind:this={container}></div>
     </div>
 
     <TradingPanel
@@ -476,18 +439,6 @@
       onClose={handleTradingClose}
       onPositionsChange={handlePositionsChangeWrapped}
       onOrdersChange={handleOrdersChangeWrapped}
-    />
-
-    <TradeContextMenu
-      x={contextMenuX}
-      y={contextMenuY}
-      price={contextMenuPrice}
-      visible={contextMenuVisible}
-      onBuyMarket={handleContextBuyMarket}
-      onSellMarket={handleContextSellMarket}
-      onBuyLimit={handleContextBuyLimit}
-      onSellLimit={handleContextSellLimit}
-      onClose={handleContextMenuClose}
     />
 
     <div class="chart-status">

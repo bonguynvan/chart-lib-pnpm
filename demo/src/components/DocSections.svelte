@@ -515,13 +515,13 @@ chart.<span class="fn">clearDrawings</span>()</pre>
   <!-- Trading Overlay -->
   <section class="doc-section" id="trading">
     <h2 class="section-title">Trading Overlay</h2>
-    <p class="section-subtitle">Render positions, orders, SL/TP directly on the chart with drag-to-modify.</p>
+    <p class="section-subtitle">Render positions, orders, SL/TP directly on the chart with drag-to-modify and trade-on-chart via right-click.</p>
 
-    <h3>Usage</h3>
+    <h3>Positions and Orders</h3>
     <div class="code-block">
-      <div class="code-header"><span>Trading API</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-header"><span>Set positions and orders</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
       <div class="code-body">
-        <pre><span class="cmt">// Set positions</span>
+        <pre><span class="cmt">// Render open positions with entry line, P&amp;L zone, SL/TP markers</span>
 chart.<span class="fn">setPositions</span>([{'{'}
   id: <span class="str">'pos-1'</span>,
   side: <span class="str">'buy'</span>,
@@ -531,7 +531,7 @@ chart.<span class="fn">setPositions</span>([{'{'}
   takeProfit: <span class="bool">45000</span>,
 {'}'}])
 
-<span class="cmt">// Set pending orders</span>
+<span class="cmt">// Render pending orders as dashed lines (draggable)</span>
 chart.<span class="fn">setOrders</span>([{'{'}
   id: <span class="str">'ord-1'</span>,
   side: <span class="str">'buy'</span>,
@@ -540,11 +540,66 @@ chart.<span class="fn">setOrders</span>([{'{'}
   quantity: <span class="bool">1</span>,
   label: <span class="str">'LIMIT'</span>,
   draggable: <span class="bool">true</span>,
-{'}'}])
+{'}'}])</pre>
+      </div>
+    </div>
 
-<span class="cmt">// Listen for modifications</span>
+    <h3>Trade on Chart (Right-Click Context Menu)</h3>
+    <p class="doc-text">Enable <code>tradingContextMenu</code> to let users right-click the chart and place orders at the clicked price. The chart emits an <code>orderPlace</code> event with the user's intent.</p>
+    <div class="code-block">
+      <div class="code-header"><span>Trade on chart</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="cmt">// Enable the built-in trading context menu</span>
+<span class="kw">const</span> chart = <span class="kw">new</span> <span class="fn">Chart</span>(container, {'{'}
+  chartType: <span class="str">'candlestick'</span>,
+  features: {'{'}
+    trading: <span class="bool">true</span>,
+    tradingContextMenu: <span class="bool">true</span>,  <span class="cmt">// enables right-click menu</span>
+  {'}'},
+{'}'})
+
+<span class="cmt">// Listen for order placement from the context menu</span>
+chart.<span class="fn">on</span>(<span class="str">'orderPlace'</span>, (e) =&gt; {'{'}
+  <span class="kw">const</span> {'{'} side, type, price {'}'} = e.payload
+  <span class="cmt">// side: 'buy' | 'sell'</span>
+  <span class="cmt">// type: 'limit' | 'stop'</span>
+  <span class="cmt">// price: number (chart price at click position)</span>
+
+  <span class="cmt">// Create the order in your system</span>
+  <span class="fn">createOrder</span>({'{'} side, type, price, quantity: <span class="bool">0.1</span> {'}'})
+{'}'})</pre>
+      </div>
+    </div>
+
+    <h3>Drag to Modify</h3>
+    <p class="doc-text">Users can drag order lines and SL/TP markers directly on the chart. Listen for modification events to sync with your backend.</p>
+    <div class="code-block">
+      <div class="code-header"><span>Handle drag events</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="cmt">// Order price changed by dragging</span>
 chart.<span class="fn">on</span>(<span class="str">'orderModify'</span>, (e) =&gt; {'{'}
-  <span class="fn">sendToServer</span>(e.payload)
+  <span class="kw">const</span> {'{'} orderId, newPrice {'}'} = e.payload
+  <span class="fn">updateOrderOnServer</span>(orderId, newPrice)
+{'}'})
+
+<span class="cmt">// Position SL/TP changed by dragging</span>
+chart.<span class="fn">on</span>(<span class="str">'positionModify'</span>, (e) =&gt; {'{'}
+  <span class="kw">const</span> {'{'} positionId, stopLoss, takeProfit {'}'} = e.payload
+  <span class="fn">updatePositionOnServer</span>(positionId, {'{'} stopLoss, takeProfit {'}'})
+{'}'})</pre>
+      </div>
+    </div>
+
+    <h3>Configuration</h3>
+    <div class="code-block">
+      <div class="code-header"><span>Trading config</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="cmt">// Customize trading overlay appearance</span>
+chart.<span class="fn">setTradingConfig</span>({'{'}
+  pricePrecision: <span class="bool">4</span>,
+  orderColors: {'{'} buy: <span class="str">'#26A69A'</span>, sell: <span class="str">'#EF5350'</span> {'}'},
+  positionColors: {'{'} profit: <span class="str">'#26A69A'</span>, loss: <span class="str">'#EF5350'</span>, entry: <span class="str">'#2196F3'</span> {'}'},
+  contextMenu: {'{'} enabled: <span class="bool">true</span> {'}'},
 {'}'})</pre>
       </div>
     </div>
@@ -562,6 +617,7 @@ chart.<span class="fn">on</span>(<span class="str">'orderModify'</span>, (e) =&g
           <tr><td><code>drawings</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable drawing tools</td></tr>
           <tr><td><code>drawingTools</code></td><td><code>DrawingToolType[]</code></td><td><code>[]</code></td><td>Whitelist of allowed drawing tools</td></tr>
           <tr><td><code>trading</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable trading overlay</td></tr>
+          <tr><td><code>tradingContextMenu</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Right-click to place orders on chart</td></tr>
           <tr><td><code>indicators</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable indicator engine</td></tr>
           <tr><td><code>panning</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable mouse/touch panning</td></tr>
           <tr><td><code>zooming</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable mouse wheel / pinch zoom</td></tr>
