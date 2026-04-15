@@ -319,7 +319,6 @@
     background: var(--bg);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
 
   .chart-body {
