@@ -21,9 +21,26 @@ interface IndicatorDef {
 
 interface DrawingToolGroup {
   readonly name: string;
-  readonly icon: string;
+  readonly svg: string;
   readonly tools: ReadonlyArray<{ readonly type: DrawingToolType; readonly label: string }>;
 }
+
+// Inline SVG icons (16x16, matching lucide-react from web3-demo)
+const SVG = {
+  cursor: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>',
+  trendingUp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  minus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  penLine: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>',
+  hash: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>',
+  square: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>',
+  gitBranch: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg>',
+  ruler: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 010 3.4l-2.6 2.6a2.4 2.4 0 01-3.4 0L2.7 8.7a2.41 2.41 0 010-3.4l2.6-2.6a2.41 2.41 0 013.4 0z"/><path d="M14.5 12.5l2-2"/><path d="M11.5 9.5l2-2"/><path d="M8.5 6.5l2-2"/><path d="M17.5 15.5l2-2"/></svg>',
+  type: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>',
+  magnet: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15a6 6 0 0012 0V6h-3v9a3 3 0 01-6 0V6H6z"/><line x1="6" y1="6" x2="9" y2="6"/><line x1="15" y1="6" x2="18" y2="6"/></svg>',
+  undo: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>',
+  redo: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13"/></svg>',
+  trash: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>',
+} as const;
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
@@ -63,7 +80,7 @@ const INDICATORS: ReadonlyArray<IndicatorDef> = [
 const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   {
     name: 'Lines',
-    icon: '\u2571',  // /
+    svg: SVG.trendingUp,
     tools: [
       { type: 'trendLine', label: 'Trend Line' },
       { type: 'ray', label: 'Ray' },
@@ -72,7 +89,7 @@ const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   },
   {
     name: 'Horizontal / Vertical',
-    icon: '\u2500',  // ─
+    svg: SVG.minus,
     tools: [
       { type: 'horizontalLine', label: 'Horizontal Line' },
       { type: 'verticalLine', label: 'Vertical Line' },
@@ -80,7 +97,7 @@ const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   },
   {
     name: 'Channels',
-    icon: '\u2550',  // ═
+    svg: SVG.penLine,
     tools: [
       { type: 'parallelChannel', label: 'Parallel Channel' },
       { type: 'regressionChannel', label: 'Regression Channel' },
@@ -88,7 +105,7 @@ const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   },
   {
     name: 'Fibonacci',
-    icon: 'F',
+    svg: SVG.hash,
     tools: [
       { type: 'fibRetracement', label: 'Fib Retracement' },
       { type: 'fibExtension', label: 'Fib Extension' },
@@ -96,7 +113,7 @@ const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   },
   {
     name: 'Shapes',
-    icon: '\u25A1',  // □
+    svg: SVG.square,
     tools: [
       { type: 'rectangle', label: 'Rectangle' },
       { type: 'ellipse', label: 'Ellipse' },
@@ -105,7 +122,7 @@ const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   },
   {
     name: 'Advanced',
-    icon: 'G',
+    svg: SVG.gitBranch,
     tools: [
       { type: 'pitchfork', label: 'Pitchfork' },
       { type: 'gannFan', label: 'Gann Fan' },
@@ -115,7 +132,7 @@ const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   },
   {
     name: 'Measure',
-    icon: 'M',
+    svg: SVG.ruler,
     tools: [
       { type: 'measure', label: 'Measure' },
       { type: 'dateRange', label: 'Date Range' },
@@ -124,7 +141,7 @@ const DRAWING_GROUPS: ReadonlyArray<DrawingToolGroup> = [
   },
   {
     name: 'Annotation',
-    icon: 'T',
+    svg: SVG.type,
     tools: [
       { type: 'text', label: 'Text Annotation' },
       { type: 'arrow', label: 'Arrow' },
@@ -425,7 +442,7 @@ function buildDrawingSidebar(): void {
   let html = '';
 
   // Cursor button
-  html += `<button class="sidebar-btn active" id="cursor-btn" title="Select"><span class="tooltip">Select</span>/</button>`;
+  html += `<button class="sidebar-btn active" id="cursor-btn" title="Select">${SVG.cursor}<span class="tooltip">Select</span></button>`;
   html += `<div class="sidebar-divider"></div>`;
 
   // Tool groups
@@ -435,7 +452,7 @@ function buildDrawingSidebar(): void {
     const multiDot = hasMultiple ? '<span class="multi-dot"></span>' : '';
 
     html += `<button class="sidebar-btn" data-group-default="${defaultTool.type}" title="${group.name}">`;
-    html += escapeHtml(group.icon);
+    html += group.svg;
     html += multiDot;
 
     if (hasMultiple) {
@@ -445,10 +462,8 @@ function buildDrawingSidebar(): void {
         html += `<button class="flyout-item" data-tool="${tool.type}">${escapeHtml(tool.label)}</button>`;
       }
       html += `</div>`;
-      html += `<span class="tooltip">${escapeHtml(group.name)}</span>`;
-    } else {
-      html += `<span class="tooltip">${escapeHtml(defaultTool.label)}</span>`;
     }
+    html += `<span class="tooltip">${escapeHtml(hasMultiple ? group.name : defaultTool.label)}</span>`;
     html += `</button>`;
   }
 
@@ -457,10 +472,10 @@ function buildDrawingSidebar(): void {
   html += `<div class="sidebar-divider"></div>`;
 
   // Bottom actions
-  html += `<button class="sidebar-btn" id="btn-magnet" title="Magnet Snap"><span style="font-size:13px">\u2299</span><span class="tooltip">Magnet Snap</span></button>`;
-  html += `<button class="sidebar-btn" id="btn-undo" title="Undo"><span style="font-size:13px">\u21B6</span><span class="tooltip">Undo</span></button>`;
-  html += `<button class="sidebar-btn" id="btn-redo" title="Redo"><span style="font-size:13px">\u21B7</span><span class="tooltip">Redo</span></button>`;
-  html += `<button class="sidebar-btn" id="btn-clear-drawings" title="Clear Drawings"><span style="font-size:13px">\u2715</span><span class="tooltip">Clear Drawings</span></button>`;
+  html += `<button class="sidebar-btn" id="btn-magnet" title="Magnet Snap">${SVG.magnet}<span class="tooltip">Magnet Snap</span></button>`;
+  html += `<button class="sidebar-btn" id="btn-undo" title="Undo">${SVG.undo}<span class="tooltip">Undo</span></button>`;
+  html += `<button class="sidebar-btn" id="btn-redo" title="Redo">${SVG.redo}<span class="tooltip">Redo</span></button>`;
+  html += `<button class="sidebar-btn" id="btn-clear-drawings" title="Clear Drawings">${SVG.trash}<span class="tooltip">Clear Drawings</span></button>`;
 
   sidebar.innerHTML = html;
 
