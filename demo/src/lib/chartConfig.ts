@@ -97,10 +97,10 @@ export interface IndicatorDef {
 export const INDICATORS: IndicatorDef[] = [
   { id: 'sma', name: 'SMA', type: 'overlay' },
   { id: 'ema', name: 'EMA', type: 'overlay' },
-  { id: 'bollinger', name: 'Bollinger Bands', type: 'overlay' },
+  { id: 'bb', name: 'Bollinger Bands', type: 'overlay' },
   { id: 'vwap', name: 'VWAP', type: 'overlay' },
   { id: 'ichimoku', name: 'Ichimoku Cloud', type: 'overlay' },
-  { id: 'parabolicsar', name: 'Parabolic SAR', type: 'overlay' },
+  { id: 'psar', name: 'Parabolic SAR', type: 'overlay' },
   { id: 'supertrend', name: 'Supertrend', type: 'overlay' },
   { id: 'keltner', name: 'Keltner Channel', type: 'overlay' },
   { id: 'donchian', name: 'Donchian Channel', type: 'overlay' },
@@ -110,16 +110,21 @@ export const INDICATORS: IndicatorDef[] = [
   { id: 'atr', name: 'ATR', type: 'panel' },
   { id: 'adx', name: 'ADX', type: 'panel' },
   { id: 'obv', name: 'OBV', type: 'panel' },
-  { id: 'williamsr', name: 'Williams %R', type: 'panel' },
+  { id: 'williamsR', name: 'Williams %R', type: 'panel' },
   { id: 'cci', name: 'CCI', type: 'panel' },
   { id: 'mfi', name: 'MFI', type: 'panel' },
   { id: 'roc', name: 'ROC', type: 'panel' },
   { id: 'tsi', name: 'TSI', type: 'panel' },
   { id: 'cmf', name: 'CMF', type: 'panel' },
+  { id: 'aroon', name: 'Aroon', type: 'panel' },
+  { id: 'stddev', name: 'Std Deviation', type: 'panel' },
+  { id: 'vroc', name: 'Volume ROC', type: 'panel' },
+  { id: 'ad', name: 'Acc/Dist', type: 'panel' },
+  { id: 'volumeProfile', name: 'Volume Profile', type: 'panel' },
 ];
 
 export const POPULAR_INDICATORS = [
-  'sma', 'ema', 'bollinger', 'rsi', 'macd', 'stochastic',
+  'sma', 'ema', 'bb', 'rsi', 'macd', 'stochastic',
   'vwap', 'atr', 'obv', 'ichimoku',
 ];
 
