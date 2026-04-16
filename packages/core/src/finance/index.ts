@@ -7,3 +7,5 @@ export { layoutUniformGrid, layoutSquarifiedTreemap } from './HeatmapLayout.js';
 export type { LayoutRect } from './HeatmapLayout.js';
 export { renderHeatmap } from './HeatmapRenderer.js';
 export type { HeatmapHitResult } from './HeatmapRenderer.js';
+export { renderWaterfall } from './WaterfallRenderer.js';
+export { renderGauge } from './GaugeRenderer.js';

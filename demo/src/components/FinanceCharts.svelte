@@ -5,6 +5,8 @@
     DepthChart,
     EquityCurveChart,
     HeatmapChart,
+    WaterfallChart,
+    GaugeChart,
     DARK_THEME,
     LIGHT_THEME,
   } from '@tradecanvas/chart';
@@ -17,6 +19,9 @@
     HeatmapOptions,
     DepthData,
     DepthLevel,
+    WaterfallBar,
+    WaterfallOptions,
+    GaugeOptions,
   } from '@tradecanvas/chart';
 
   // --- Seeded random for deterministic data ---
@@ -117,17 +122,46 @@
     { id: 'apt', label: 'APT', value: -0.9, weight: 7 },
   ];
 
+  // --- Waterfall data ---
+  const waterfallData: WaterfallBar[] = [
+    { label: 'Start', value: 10000, type: 'total' },
+    { label: 'BTC Long', value: 1850 },
+    { label: 'ETH Short', value: -620 },
+    { label: 'SOL Long', value: 420 },
+    { label: 'Fees', value: -85 },
+    { label: 'End', value: 11565, type: 'total' },
+  ];
+
+  // --- Gauge data ---
+  const gaugeData: GaugeOptions = {
+    value: 72,
+    min: 0,
+    max: 100,
+    label: 'Fear & Greed',
+    zones: [
+      { from: 0, to: 25, color: '#ef4444' },
+      { from: 25, to: 50, color: '#f59e0b' },
+      { from: 50, to: 75, color: '#eab308' },
+      { from: 75, to: 100, color: '#10b981' },
+    ],
+  };
+
   // --- Container refs ---
   let sparkGridEl: HTMLDivElement | undefined = $state();
   let equityContainer: HTMLDivElement | undefined = $state();
   let depthContainer: HTMLDivElement | undefined = $state();
   let heatmapContainer: HTMLDivElement | undefined = $state();
+  let waterfallContainer: HTMLDivElement | undefined = $state();
+  let gaugeContainer: HTMLDivElement | undefined = $state();
 
   // --- Chart instances ---
   let sparkCharts: SparklineChart[] = [];
   let equityChart: EquityCurveChart | null = null;
   let depthChart: DepthChart | null = null;
   let heatmapChart: HeatmapChart | null = null;
+  let waterfallChart: WaterfallChart | null = null;
+  let gaugeChart: GaugeChart | null = null;
+  let gaugeInterval: ReturnType<typeof setInterval> | null = null;
 
   function isDarkMode(): boolean {
     return !document.body.classList.contains('light');
@@ -154,6 +188,8 @@
     equityChart?.setTheme(theme);
     depthChart?.setTheme(theme);
     heatmapChart?.setTheme(theme);
+    waterfallChart?.setTheme(theme);
+    gaugeChart?.setTheme(theme);
   }
 
   onMount(async () => {
@@ -221,6 +257,34 @@
       });
     }
 
+    // Waterfall
+    if (waterfallContainer) {
+      waterfallChart = new WaterfallChart(waterfallContainer, {
+        data: waterfallData,
+        showValues: true,
+        connectorStyle: 'dashed',
+        valueFormat: (v: number) => `$${v.toLocaleString()}`,
+        crosshair: true,
+        theme,
+      });
+    }
+
+    // Gauge
+    if (gaugeContainer) {
+      gaugeChart = new GaugeChart(gaugeContainer, {
+        ...gaugeData,
+        theme,
+      });
+
+      // Animate gauge value every 3 seconds
+      gaugeInterval = setInterval(() => {
+        if (gaugeChart) {
+          const newValue = Math.round(30 + Math.random() * 60);
+          gaugeChart.setValue(newValue);
+        }
+      }, 3000);
+    }
+
     // Watch for theme changes on <body>
     themeObserver = new MutationObserver(() => {
       applyThemeToAll();
@@ -242,6 +306,14 @@
     depthChart = null;
     heatmapChart?.destroy();
     heatmapChart = null;
+    waterfallChart?.destroy();
+    waterfallChart = null;
+    gaugeChart?.destroy();
+    gaugeChart = null;
+    if (gaugeInterval) {
+      clearInterval(gaugeInterval);
+      gaugeInterval = null;
+    }
     themeObserver?.disconnect();
     themeObserver = null;
   });
@@ -286,9 +358,21 @@
   </div>
 
   <!-- Heatmap -->
-  <div class="chart-card">
+  <div class="chart-card chart-card--spaced">
     <div class="card-label">Crypto Market Heatmap</div>
     <div class="card-chart card-chart--350" bind:this={heatmapContainer}></div>
+  </div>
+
+  <!-- Waterfall + Gauge Row -->
+  <div class="mid-grid">
+    <div class="chart-card">
+      <div class="card-label">P&amp;L Attribution</div>
+      <div class="card-chart card-chart--300" bind:this={waterfallContainer}></div>
+    </div>
+    <div class="chart-card">
+      <div class="card-label">Fear &amp; Greed Index</div>
+      <div class="card-chart card-chart--300" bind:this={gaugeContainer}></div>
+    </div>
   </div>
 </section>
 
@@ -390,6 +474,10 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+  }
+
+  .chart-card--spaced {
+    margin-bottom: 20px;
   }
 
   .card-label {

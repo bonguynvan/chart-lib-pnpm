@@ -119,7 +119,7 @@ export type { EasingFn, AnimationOptions } from '@tradecanvas/core';
 export { KeyboardHandler, CrosshairTooltip } from '@tradecanvas/core';
 
 // Finance charts
-export { SparklineChart, DepthChart, EquityCurveChart, HeatmapChart } from './finance/index.js';
+export { SparklineChart, DepthChart, EquityCurveChart, HeatmapChart, WaterfallChart, GaugeChart } from './finance/index.js';
 export type {
   BaseFinanceChartOptions,
   SparklineOptions,
@@ -128,4 +128,8 @@ export type {
   EquityCurveOptions,
   HeatmapCell,
   HeatmapOptions,
+  WaterfallBar,
+  WaterfallOptions,
+  GaugeZone,
+  GaugeOptions,
 } from '@tradecanvas/commons';

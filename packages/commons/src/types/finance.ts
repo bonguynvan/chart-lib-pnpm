@@ -81,3 +81,50 @@ export interface HeatmapOptions extends BaseFinanceChartOptions {
   onCellClick?: (cell: HeatmapCell) => void;
   crosshair?: boolean;
 }
+
+export interface WaterfallBar {
+  label: string;
+  value: number;
+  type?: 'positive' | 'negative' | 'total' | 'subtotal';
+}
+
+export interface WaterfallOptions extends BaseFinanceChartOptions {
+  data: WaterfallBar[];
+  positiveColor?: string;
+  negativeColor?: string;
+  totalColor?: string;
+  subtotalColor?: string;
+  connectorColor?: string;
+  connectorStyle?: 'dashed' | 'solid' | 'none';
+  barWidth?: number;
+  showValues?: boolean;
+  showDelta?: boolean;
+  valueFormat?: (v: number) => string;
+  labelFormat?: (label: string) => string;
+  crosshair?: boolean;
+}
+
+export interface GaugeZone {
+  from: number;
+  to: number;
+  color: string;
+  label?: string;
+}
+
+export interface GaugeOptions extends BaseFinanceChartOptions {
+  value: number;
+  min?: number;
+  max?: number;
+  zones?: GaugeZone[];
+  thickness?: number;
+  startAngle?: number;
+  endAngle?: number;
+  showValue?: boolean;
+  showZoneLabels?: boolean;
+  label?: string;
+  valueFormat?: (v: number) => string;
+  needleColor?: string;
+  trackColor?: string;
+  animate?: boolean;
+  animationDuration?: number;
+}

@@ -996,6 +996,88 @@ depth.<span class="fn">update</span>(newDepthData)</pre>
       </div>
     </div>
 
+    <h3>WaterfallChart</h3>
+    <p class="doc-text">Visualize running totals with positive/negative contributions. Perfect for P&amp;L attribution, revenue bridges, and cash flow analysis.</p>
+    <div class="code-block">
+      <div class="code-header"><span>Waterfall</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="kw">import</span> {'{'} <span class="obj">WaterfallChart</span> {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/chart'</span>
+<span class="kw">import type</span> {'{'} <span class="obj">WaterfallBar</span> {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/chart'</span>
+
+<span class="kw">const</span> data: <span class="obj">WaterfallBar</span>[] = [
+  {'{'} label: <span class="str">'Start'</span>, value: <span class="bool">10000</span>, type: <span class="str">'total'</span> {'}'},
+  {'{'} label: <span class="str">'BTC Long'</span>, value: <span class="bool">1850</span> {'}'},      <span class="cmt">// positive — green</span>
+  {'{'} label: <span class="str">'ETH Short'</span>, value: <span class="bool">-620</span> {'}'},      <span class="cmt">// negative — red</span>
+  {'{'} label: <span class="str">'Fees'</span>, value: <span class="bool">-85</span> {'}'},
+  {'{'} label: <span class="str">'End'</span>, value: <span class="bool">11145</span>, type: <span class="str">'total'</span> {'}'},
+]
+
+<span class="kw">const</span> waterfall = <span class="kw">new</span> <span class="fn">WaterfallChart</span>(container, {'{'}
+  data,
+  showValues: <span class="bool">true</span>,
+  connectorStyle: <span class="str">'dashed'</span>,
+  valueFormat: (v) =&gt; <span class="str">`$${'{'}v.toLocaleString(){'}'}</span><span class="str">`</span>,
+  crosshair: <span class="bool">true</span>,
+{'}'})</pre>
+      </div>
+    </div>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>data</code></td><td><code>WaterfallBar[]</code></td><td>required</td><td>Array of bars with label/value/type</td></tr>
+          <tr><td><code>positiveColor</code></td><td><code>string</code></td><td>theme green</td><td>Color for gain bars</td></tr>
+          <tr><td><code>negativeColor</code></td><td><code>string</code></td><td>theme red</td><td>Color for loss bars</td></tr>
+          <tr><td><code>totalColor</code></td><td><code>string</code></td><td>theme blue</td><td>Color for total bars</td></tr>
+          <tr><td><code>connectorStyle</code></td><td><code>'dashed' | 'solid' | 'none'</code></td><td><code>'dashed'</code></td><td>Line between bars</td></tr>
+          <tr><td><code>barWidth</code></td><td><code>number</code></td><td><code>0.7</code></td><td>Bar width ratio (0-1)</td></tr>
+          <tr><td><code>showValues</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Value labels on bars</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>GaugeChart</h3>
+    <p class="doc-text">Speedometer-style gauge for KPIs, risk scores, and sentiment indicators. Supports colored zones and smooth value animation.</p>
+    <div class="code-block">
+      <div class="code-header"><span>Gauge</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="kw">import</span> {'{'} <span class="obj">GaugeChart</span> {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/chart'</span>
+
+<span class="kw">const</span> gauge = <span class="kw">new</span> <span class="fn">GaugeChart</span>(container, {'{'}
+  value: <span class="bool">72</span>,
+  min: <span class="bool">0</span>,
+  max: <span class="bool">100</span>,
+  label: <span class="str">'Fear &amp; Greed'</span>,
+  zones: [
+    {'{'} from: <span class="bool">0</span>, to: <span class="bool">25</span>, color: <span class="str">'#ef4444'</span> {'}'},    <span class="cmt">// extreme fear</span>
+    {'{'} from: <span class="bool">25</span>, to: <span class="bool">50</span>, color: <span class="str">'#f59e0b'</span> {'}'},   <span class="cmt">// fear</span>
+    {'{'} from: <span class="bool">50</span>, to: <span class="bool">75</span>, color: <span class="str">'#eab308'</span> {'}'},   <span class="cmt">// greed</span>
+    {'{'} from: <span class="bool">75</span>, to: <span class="bool">100</span>, color: <span class="str">'#10b981'</span> {'}'},  <span class="cmt">// extreme greed</span>
+  ],
+  animate: <span class="bool">true</span>,
+{'}'})
+
+<span class="cmt">// Smoothly animate to new value</span>
+gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
+      </div>
+    </div>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>value</code></td><td><code>number</code></td><td>required</td><td>Current gauge value</td></tr>
+          <tr><td><code>min</code></td><td><code>number</code></td><td><code>0</code></td><td>Minimum value</td></tr>
+          <tr><td><code>max</code></td><td><code>number</code></td><td><code>100</code></td><td>Maximum value</td></tr>
+          <tr><td><code>zones</code></td><td><code>GaugeZone[]</code></td><td>—</td><td>Colored range zones</td></tr>
+          <tr><td><code>thickness</code></td><td><code>number</code></td><td><code>0.25</code></td><td>Arc thickness (0-1 of radius)</td></tr>
+          <tr><td><code>animate</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Smooth animation on setValue</td></tr>
+          <tr><td><code>animationDuration</code></td><td><code>number</code></td><td><code>500</code></td><td>Animation duration (ms)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <h3>Shared API</h3>
     <p class="doc-text">All finance charts share these methods:</p>
     <div class="doc-table-wrap">
