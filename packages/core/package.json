@@ -1,6 +1,6 @@
 {
   "name": "@tradecanvas/core",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "type": "module",
   "description": "Canvas rendering engine for @tradecanvas/chart",
   "license": "MIT",
@@ -13,7 +13,12 @@
     "access": "public"
   },
   "sideEffects": false,
-  "keywords": ["trading", "chart", "canvas", "types"],
+  "keywords": [
+    "trading",
+    "chart",
+    "canvas",
+    "types"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,7 +29,10 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",

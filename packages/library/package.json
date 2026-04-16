@@ -1,6 +1,6 @@
 {
   "name": "@tradecanvas/chart",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "type": "module",
   "description": "High-performance canvas trading chart with built-in indicators, drawing tools, and real-time streaming. Zero external dependencies.",
   "license": "MIT",
@@ -13,7 +13,19 @@
     "access": "public"
   },
   "sideEffects": false,
-  "keywords": ["trading", "chart", "canvas", "candlestick", "ohlc", "indicators", "drawing-tools", "technical-analysis", "financial-chart", "real-time", "typescript"],
+  "keywords": [
+    "trading",
+    "chart",
+    "canvas",
+    "candlestick",
+    "ohlc",
+    "indicators",
+    "drawing-tools",
+    "technical-analysis",
+    "financial-chart",
+    "real-time",
+    "typescript"
+  ],
   "homepage": "https://github.com/bonguynvan/tradecanvas",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -25,7 +37,10 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
