@@ -5,6 +5,7 @@
     openReactSandbox,
     openSvelteSandbox,
     openVueSandbox,
+    openFinanceChartsSandbox,
   } from '../lib/sandboxes';
 
   onMount(() => {
@@ -308,6 +309,14 @@ chart.<span class="fn">setData</span>(bars)</pre>
           <div class="sandbox-card-name">Vue</div>
           <p class="sandbox-card-desc">Minimal setup with a live chart</p>
           <button class="stackblitz-btn" onclick={openVueSandbox}>
+            <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
+            Open in StackBlitz
+          </button>
+        </div>
+        <div class="sandbox-card">
+          <div class="sandbox-card-name">Waterfall + Gauge</div>
+          <p class="sandbox-card-desc">P&L attribution and Fear & Greed gauge</p>
+          <button class="stackblitz-btn" onclick={openFinanceChartsSandbox}>
             <svg width="14" height="14" viewBox="0 0 28 28" fill="currentColor"><polygon points="12.5 2 3 22 13 22 15.5 26 25 6 15 6"/></svg>
             Open in StackBlitz
           </button>
@@ -1078,6 +1087,12 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
       </table>
     </div>
 
+    <div class="stackblitz-row">
+      <button class="stackblitz-btn" onclick={openFinanceChartsSandbox}>
+        Try Waterfall + Gauge in StackBlitz
+      </button>
+    </div>
+
     <h3>Shared API</h3>
     <p class="doc-text">All finance charts share these methods:</p>
     <div class="doc-table-wrap">
@@ -1206,6 +1221,27 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
     <p class="section-subtitle">Release history for @tradecanvas/chart.</p>
 
     <div class="changelog">
+      <div class="changelog-version">
+        <h3>0.3.0 <span class="changelog-date">2026-04-16</span></h3>
+        <div class="changelog-group">
+          <h4>Features</h4>
+          <ul>
+            <li><code>WaterfallChart</code> — running cumulative bars for P&L attribution, revenue bridge, cash flow</li>
+            <li><code>GaugeChart</code> — speedometer-style gauge with colored zones and animated value transitions</li>
+            <li>StackBlitz sandbox for Waterfall + Gauge combined demo</li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>Performance</h4>
+          <ul>
+            <li>Batched path operations grouped by color (single fill per group)</li>
+            <li>Integer pixel rounding for crisp 1px lines</li>
+            <li>Cached trig calculations in gauge</li>
+            <li>rAF-coalesced animation (safe on rapid <code>setValue</code> calls)</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="changelog-version">
         <h3>0.2.0 <span class="changelog-date">2026-04-16</span></h3>
         <div class="changelog-group">
@@ -1626,6 +1662,11 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
 
   :global(.stackblitz-btn:active) {
     background: rgba(59, 130, 246, 0.18);
+  }
+
+  :global(.stackblitz-row) {
+    margin: 16px 0 24px;
+    display: flex;
   }
 
   /* Sandbox cards */

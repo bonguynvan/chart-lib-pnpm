@@ -1,6 +1,6 @@
 import sdk from '@stackblitz/sdk';
 
-const CHART_VERSION = '^0.1.3';
+const CHART_VERSION = '^0.3.0';
 
 const BODY_CSS = 'body { margin: 0; background: #131722; }';
 
@@ -435,5 +435,99 @@ export function openVueSandbox(): void {
       },
     },
     { openFile: 'src/TradingChart.vue', newWindow: true },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Finance Charts — Waterfall + Gauge (combined)
+// ---------------------------------------------------------------------------
+
+export function openFinanceChartsSandbox(): void {
+  sdk.openProject(
+    {
+      title: 'TradeCanvas — Finance Charts (Waterfall + Gauge)',
+      template: 'node',
+      files: {
+        'package.json': JSON.stringify(
+          {
+            name: 'tc-sandbox-finance',
+            private: true,
+            type: 'module',
+            scripts: { dev: 'vite' },
+            dependencies: { '@tradecanvas/chart': CHART_VERSION },
+            devDependencies: { vite: '^6.0.0', typescript: '~5.7.0' },
+          },
+          null,
+          2,
+        ),
+        'tsconfig.json': BASIC_TSCONFIG,
+        'index.html': [
+          '<!DOCTYPE html>',
+          '<html lang="en">',
+          '<head>',
+          '  <meta charset="UTF-8" />',
+          '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+          '  <title>TradeCanvas — Finance Charts</title>',
+          `  <style>${BODY_CSS} .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }`,
+          `    .card { background: #1e222d; border-radius: 8px; overflow: hidden; }`,
+          `    .card-label { padding: 10px 16px; font: 600 11px sans-serif; color: #787b86; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #2a2e39; }`,
+          `    .chart { height: 320px; width: 100%; }</style>`,
+          '</head>',
+          '<body>',
+          '  <div class="grid">',
+          '    <div class="card"><div class="card-label">P&L Attribution</div><div id="waterfall" class="chart"></div></div>',
+          '    <div class="card"><div class="card-label">Fear & Greed</div><div id="gauge" class="chart"></div></div>',
+          '  </div>',
+          '  <script type="module" src="/src/main.ts"></script>',
+          '</body>',
+          '</html>',
+        ].join('\n'),
+        'src/main.ts': [
+          "import { WaterfallChart, GaugeChart } from '@tradecanvas/chart';",
+          "import type { WaterfallBar } from '@tradecanvas/chart';",
+          '',
+          '// P&L Attribution Waterfall',
+          'const waterfallData: WaterfallBar[] = [',
+          "  { label: 'Start', value: 10000, type: 'total' },",
+          "  { label: 'BTC Long', value: 1850 },",
+          "  { label: 'ETH Short', value: -620 },",
+          "  { label: 'SOL Long', value: 420 },",
+          "  { label: 'Fees', value: -85 },",
+          "  { label: 'End', value: 11565, type: 'total' },",
+          '];',
+          '',
+          "const waterfallEl = document.getElementById('waterfall')!;",
+          'new WaterfallChart(waterfallEl, {',
+          '  data: waterfallData,',
+          '  showValues: true,',
+          "  connectorStyle: 'dashed',",
+          '  valueFormat: (v) => `$${v.toLocaleString()}`,',
+          '  crosshair: true,',
+          '});',
+          '',
+          '// Fear & Greed Gauge',
+          "const gaugeEl = document.getElementById('gauge')!;",
+          'const gauge = new GaugeChart(gaugeEl, {',
+          '  value: 72,',
+          '  min: 0,',
+          '  max: 100,',
+          "  label: 'Fear & Greed',",
+          '  zones: [',
+          "    { from: 0, to: 25, color: '#ef4444' },",
+          "    { from: 25, to: 50, color: '#f59e0b' },",
+          "    { from: 50, to: 75, color: '#eab308' },",
+          "    { from: 75, to: 100, color: '#10b981' },",
+          '  ],',
+          '  animate: true,',
+          '});',
+          '',
+          '// Animate the gauge value every 3 seconds',
+          'setInterval(() => {',
+          '  gauge.setValue(Math.round(30 + Math.random() * 60));',
+          '}, 3000);',
+        ].join('\n'),
+      },
+    },
+    { openFile: 'src/main.ts', newWindow: true },
   );
 }
