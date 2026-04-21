@@ -347,7 +347,7 @@ chart.<span class="fn">setData</span>(bars)</pre>
   <span class="fn">connect</span>(config: <span class="obj">DataAdapterConfig</span>): <span class="kw">void</span> {'{'}
     <span class="cmt">// Subscribe to Tauri events</span>
     listen(<span class="str">'feed:message'</span>, (msg) =&gt; {'{'}
-      <span class="cmt">// Wire format { t, o, h, l, c, v } → OHLCBar</span>
+      <span class="cmt">// Wire format {'{'} t, o, h, l, c, v {'}'} to OHLCBar</span>
       <span class="kw">const</span> bar = <span class="fn">normalizeBar</span>(msg.payload)
       this.<span class="fn">emit</span>(<span class="str">'bar'</span>, {'{'} bar, closed: msg.payload.closed {'}'})
     {'}'})
