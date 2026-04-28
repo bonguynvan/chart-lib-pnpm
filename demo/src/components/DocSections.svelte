@@ -798,7 +798,7 @@ chart.<span class="fn">setLogScale</span>(<span class="bool">true</span>)</pre>
   <!-- Indicators -->
   <section class="doc-section" id="indicators">
     <h2 class="section-title">Indicators</h2>
-    <p class="section-subtitle">26 built-in technical indicators, fully computed on the client.</p>
+    <p class="section-subtitle">33 built-in technical indicators, fully computed on the client.</p>
 
     <h3>Available Indicators</h3>
     <div class="doc-table-wrap">
@@ -1520,6 +1520,46 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
     <p class="section-subtitle">Release history for @tradecanvas/chart.</p>
 
     <div class="changelog">
+      <div class="changelog-version">
+        <h3>0.6.0 <span class="changelog-date">2026-04-28</span></h3>
+        <div class="changelog-group">
+          <h4>Features</h4>
+          <ul>
+            <li><strong>7 new indicators</strong> — Hull MA, Pivot Points (Classic), Anchored VWAP, ZigZag, Linear Regression Channel, Awesome Oscillator, Chaikin Oscillator. Total: 33 built-in</li>
+            <li><strong>Range Bars chart type</strong> (<code>'rangeBars'</code>) — fixed price-range bars with <code>toRangeBars</code> transform</li>
+            <li><strong>Trading overlay customization</strong> — partial-close strip via <code>TradingPosition.closedQuantity</code>, multi-stop P&amp;L color gradient via <code>pnlThresholds</code>, custom label templates via <code>positionLabel</code> with token substitution</li>
+            <li><strong>Web Worker indicator pipeline</strong> — <code>IndicatorWorkerHost</code> moves indicator math off the render loop. Promise-based <code>calculate()</code>, sync fallback for SSR/tests, per-request timeout, ping/terminate</li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>Type safety</h4>
+          <ul>
+            <li>New <code>getNumberParam</code> / <code>getIntParam</code> helpers — all 25 existing indicators migrated. Invalid params (NaN, Infinity, missing keys, non-numeric strings) fall back to documented defaults</li>
+            <li><code>BinanceAdapter</code> REST + WS payloads flow through typed <code>parseRestKline</code> / <code>parseWsKline</code> validators — no more <code>any</code> casts</li>
+            <li><code>ChartStateManager.deserialize</code> validates and filters malformed drawings/orders/positions/indicators instead of trusting <code>JSON.parse</code></li>
+            <li><code>TextAnnotationTool</code> text resolution moved to a pure <code>resolveAnnotationText</code> helper (no <code>as string</code> cast)</li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>Internal refactor</h4>
+          <ul>
+            <li><code>WidgetStyles.ts</code> 764 → 31 LOC; CSS extracted to sibling <code>.css</code> file via Vite <code>?raw</code></li>
+            <li>Chart-type dispatch extracted into <code>ChartTypeStrategy</code> (<code>createRendererFor</code>, <code>transformDisplayData</code>)</li>
+            <li>Auto-save debounce extracted into <code>AutoSaveScheduler</code></li>
+            <li>Indicator panel scaling extracted into <code>computeIndicatorPriceRange</code> (now skips NaN/Infinity)</li>
+            <li><code>Chart.ts</code>: 1632 → 1536 LOC</li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>Tests &amp; CI</h4>
+          <ul>
+            <li>267 tests across 40 files — Vitest scaffolded in <code>@tradecanvas/core</code> and <code>@tradecanvas/chart</code></li>
+            <li>25/33 indicators with direct test coverage</li>
+            <li>GitHub Actions CI workflow added</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="changelog-version">
         <h3>0.5.0 <span class="changelog-date">2026-04-16</span></h3>
         <div class="changelog-group">

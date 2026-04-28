@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.6.0 (2026-04-28)
+
+### Features
+
+- **7 new indicators**
+  - **Hull MA** (overlay) — low-lag WMA-of-WMA-diff smoothing
+  - **Pivot Points (Classic)** (overlay) — S3/S2/S1/PP/R1/R2/R3 with configurable lookback window
+  - **Anchored VWAP** (overlay) — VWAP that resets at a chosen `anchorTime`
+  - **ZigZag** (overlay) — swing-pivot connector with percentage-deviation threshold
+  - **Linear Regression Channel** (overlay) — least-squares fit + std-dev bands
+  - **Awesome Oscillator** (panel) — fast/slow median histogram with up/down coloring
+  - **Chaikin Oscillator** (panel) — EMA(ADL, fast) − EMA(ADL, slow), exposes cumulative ADL
+- **Range Bars chart type** (`'rangeBars'`) — fixed price-range bars (each bar's high − low equals a configured range), with `toRangeBars` transform
+- **Trading overlay customization** (additive, no breaking changes)
+  - `TradingPosition.closedQuantity` — partial-close visualization as a left-edge dim band proportional to closed fraction
+  - `TradingConfig.pnlThresholds: PnLThreshold[]` — multi-stop color gradient driven by live P&L
+  - `TradingConfig.positionLabel: string | (ctx) => string` — token templating (`{side}`, `{qty}`, `{openQty}`, `{closedQty}`, `{entry}`, `{price}`, `{pnl}`, `{pnlPct}`, `{pnlSign}`)
+- **Web Worker indicator pipeline** — new `IndicatorWorkerHost` and bundled `indicator.worker.js` register all 33 built-in indicators. Promise-based `host.calculate(...)` offloads heavy compute off the render loop. Pass `null` for the worker to use the synchronous fallback (SSR, tests, safety net). Per-request timeout, `ping()` health check, `terminate()` cleans up pending work
+
+### Type safety
+
+- New `getNumberParam` / `getIntParam` helpers exported from `@tradecanvas/core`
+- All 25 existing indicators migrated to the helpers — invalid params (NaN, Infinity, missing keys, non-numeric strings) now fall back to documented defaults instead of silently propagating to calculations
+- `BinanceAdapter` REST and WS payloads now flow through typed `parseRestKline` / `parseWsKline` validators; `any[]` and `any` casts are gone
+- `TextAnnotationTool` text resolution moved to a pure `resolveAnnotationText` helper (no more `as string` cast)
+- `ChartStateManager.deserialize` validates the parsed shape — malformed drawings/orders/positions/indicators are filtered, missing or wrong-typed viewport fields fall back to defaults
+
+### Internal refactor
+
+- `WidgetStyles.ts` (764 LOC of CSS-in-string) extracted into a sibling `WidgetStyles.css` file, imported via Vite's `?raw` query and inlined at build time. The TS shim is now 31 LOC; CSS is editable as CSS (syntax highlighting, linting). Public API (`injectWidgetStyles` / `removeWidgetStyles`) unchanged.
+- Chart-type dispatch (`createChartRenderer` and `getDisplayData`) extracted from `Chart.ts` into a new `ChartTypeStrategy` module with `createRendererFor`, `transformDisplayData`, and `isTransformedChartType` helpers
+- Auto-save debounce extracted into `AutoSaveScheduler` (testable state machine, owner injects the save callback)
+- Indicator panel scaling math extracted into `computeIndicatorPriceRange` (now correctly skips NaN/Infinity values)
+- Removed duplicate `timeframeToMs` private method from `Chart.ts`; uses the shared helper from `@tradecanvas/commons`
+- `Chart.ts`: 1632 → 1536 LOC
+
+### Test coverage
+
+- 267 tests across 40 files (Vitest scaffolded in `@tradecanvas/core` and `@tradecanvas/chart`)
+- 25/33 indicators with direct test coverage
+- New tests for: indicator math (Hull MA, Pivot Points, Anchored VWAP, ZigZag, LRC, Awesome / Chaikin Oscillator, BB, ATR, Stochastic, OBV, VWAP, Ichimoku, Supertrend, Keltner, Donchian, ADX, CCI, MFI, Williams %R, Parabolic SAR), range-bar transform, trading position formatting, drawing-tool hit-test geometry, `DrawingManager` CRUD, Binance kline parsers, `ReconnectManager` backoff/cap/give-up, `TickAggregator` (tick + pre-formed-bar paths, ring buffer eviction), `ChartState` JSON + localStorage round-trip + validator, `IndicatorWorkerHost` (worker + fallback), `ChartTypeStrategy`, `AutoSaveScheduler`, `IndicatorPriceRange`
+- GitHub Actions CI workflow added under `.github/workflows/test.yml` (Node 20.19, pnpm 9.15, builds commons, runs `pnpm test`)
+- Root `pnpm test` runs both packages
+
+### Demo
+
+- Chart-types dropdown extended with Renko, Kagi, Line Break, Point & Figure, **Range Bars**
+- Indicator picker extended with Hull MA, Anchored VWAP, Pivot Points, ZigZag, Linear Regression Channel, Awesome Oscillator, Chaikin Oscillator (all 33 indicators selectable)
+
 ## 0.5.0 (2026-04-16)
 
 ### Features
