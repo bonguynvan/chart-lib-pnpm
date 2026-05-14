@@ -1,0 +1,54 @@
+{
+  "name": "@tradecanvas/svelte",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "description": "Svelte 5 component for @tradecanvas/chart — reactive props, runes, zero boilerplate.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bonguynvan/tradecanvas.git",
+    "directory": "packages/svelte"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "trading",
+    "chart",
+    "svelte",
+    "svelte5",
+    "candlestick",
+    "canvas",
+    "technical-analysis"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "svelte": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "svelte-package -i src",
+    "dev": "svelte-package -i src --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@tradecanvas/chart": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": ">=5.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/package": "^2.3.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "svelte": "^5.20.0"
+  }
+}

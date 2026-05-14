@@ -1,0 +1,55 @@
+{
+  "name": "@tradecanvas/react",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "description": "React component for @tradecanvas/chart — reactive props, ref forwarding, zero boilerplate.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bonguynvan/tradecanvas.git",
+    "directory": "packages/react"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "trading",
+    "chart",
+    "react",
+    "candlestick",
+    "canvas",
+    "technical-analysis"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@tradecanvas/chart": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.5.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}

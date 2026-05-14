@@ -100,6 +100,8 @@
     <a class="docs-sidebar-link" href="#trading">Trading Overlay</a>
     <a class="docs-sidebar-link" href="#signals">Signal Markers</a>
     <a class="docs-sidebar-link" href="#tradezones">Trade Zones</a>
+    <a class="docs-sidebar-link" href="#frameworks">Framework Wrappers</a>
+    <a class="docs-sidebar-link" href="#embed">Embeddable Widget</a>
     <a class="docs-sidebar-link" href="#features">Features Config</a>
     <a class="docs-sidebar-link" href="#mobile">Mobile &amp; Touch</a>
     <a class="docs-sidebar-link" href="#events">Events</a>
@@ -1188,6 +1190,176 @@ chart.<span class="fn">setTradeZoneStyle</span>({'{'}
     </div>
   </section>
 
+  <!-- Framework Wrappers -->
+  <section class="doc-section" id="frameworks">
+    <h2 class="section-title">Framework Wrappers</h2>
+    <p class="section-subtitle">First-party components for React, Vue 3, and Svelte 5. Each wrapper provides reactive props, ref access to the underlying <code>Chart</code> instance, and built-in screenshot helpers.</p>
+
+    <h3>Install</h3>
+    <div class="code-block">
+      <div class="code-header"><span>npm</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="cmt"># React</span>
+npm install @tradecanvas/chart @tradecanvas/react
+
+<span class="cmt"># Vue 3</span>
+npm install @tradecanvas/chart @tradecanvas/vue
+
+<span class="cmt"># Svelte 5</span>
+npm install @tradecanvas/chart @tradecanvas/svelte</pre>
+      </div>
+    </div>
+
+    <h3>React</h3>
+    <div class="code-block">
+      <div class="code-header"><span>React</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="kw">import</span> {'{'} TradeCanvas {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/react'</span>
+<span class="kw">import</span> {'{'} useRef {'}'} <span class="kw">from</span> <span class="str">'react'</span>
+
+<span class="kw">function</span> <span class="fn">App</span>() {'{'}
+  <span class="kw">const</span> chartRef = <span class="fn">useRef</span>(<span class="bool">null</span>)
+
+  <span class="kw">return</span> (
+    &lt;<span class="fn">TradeCanvas</span>
+      ref={'{'}chartRef{'}'}
+      symbol=<span class="str">"BTCUSDT"</span>
+      timeframe=<span class="str">"5m"</span>
+      theme=<span class="str">"dark"</span>
+      indicators={'{'}[<span class="str">'ema'</span>, <span class="str">'rsi'</span>]{'}'}
+      onReady={'{'}(chart) =&gt; console.log(<span class="str">'Chart ready'</span>, chart){'}'}
+    /&gt;
+  )
+{'}'}</pre>
+      </div>
+    </div>
+
+    <h3>Vue 3</h3>
+    <div class="code-block">
+      <div class="code-header"><span>Vue</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre>&lt;<span class="kw">script</span> setup lang=<span class="str">"ts"</span>&gt;
+<span class="kw">import</span> {'{'} ref {'}'} <span class="kw">from</span> <span class="str">'vue'</span>
+<span class="kw">import</span> {'{'} TradeCanvas {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/vue'</span>
+
+<span class="kw">const</span> chartRef = <span class="fn">ref</span>()
+&lt;/<span class="kw">script</span>&gt;
+
+&lt;<span class="kw">template</span>&gt;
+  &lt;<span class="fn">TradeCanvas</span>
+    ref=<span class="str">"chartRef"</span>
+    symbol=<span class="str">"ETHUSDT"</span>
+    timeframe=<span class="str">"15m"</span>
+    theme=<span class="str">"dark"</span>
+    :indicators=<span class="str">"['macd', 'bb']"</span>
+    @ready=<span class="str">"(chart) =&gt; console.log('Ready', chart)"</span>
+  /&gt;
+&lt;/<span class="kw">template</span>&gt;</pre>
+      </div>
+    </div>
+
+    <h3>Svelte 5</h3>
+    <div class="code-block">
+      <div class="code-header"><span>Svelte</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre>&lt;<span class="kw">script</span> lang=<span class="str">"ts"</span>&gt;
+  <span class="kw">import</span> {'{'} TradeCanvas {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/svelte'</span>
+  <span class="kw">let</span> chart = $state(<span class="bool">null</span>)
+&lt;/<span class="kw">script</span>&gt;
+
+&lt;<span class="fn">TradeCanvas</span>
+  bind:chart
+  symbol=<span class="str">"BTCUSDT"</span>
+  timeframe=<span class="str">"1h"</span>
+  theme=<span class="str">"dark"</span>
+  indicators={'{'}[<span class="str">'ema'</span>, <span class="str">'volume'</span>]{'}'}
+/&gt;</pre>
+      </div>
+    </div>
+
+    <h3>Shared Props</h3>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>symbol</code></td><td><code>string</code></td><td><code>'BTCUSDT'</code></td><td>Trading pair</td></tr>
+          <tr><td><code>timeframe</code></td><td><code>TimeFrame</code></td><td><code>'5m'</code></td><td>Candlestick period</td></tr>
+          <tr><td><code>theme</code></td><td><code>'dark' | 'light' | Theme</code></td><td><code>'dark'</code></td><td>Theme name or full Theme object</td></tr>
+          <tr><td><code>chartType</code></td><td><code>ChartType</code></td><td><code>'candlestick'</code></td><td>Bar rendering style</td></tr>
+          <tr><td><code>indicators</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Active indicator IDs</td></tr>
+          <tr><td><code>data</code></td><td><code>OHLCBar[]</code></td><td>—</td><td>Static data (skips adapter)</td></tr>
+          <tr><td><code>adapter</code></td><td><code>DataAdapter</code></td><td><code>BinanceAdapter</code></td><td>Custom data adapter</td></tr>
+          <tr><td><code>signalMarkers</code></td><td><code>SignalMarker[]</code></td><td>—</td><td>Signal overlay markers</td></tr>
+          <tr><td><code>tradeZones</code></td><td><code>TradeZone[]</code></td><td>—</td><td>Trade zone overlays</td></tr>
+          <tr><td><code>watermarkText</code></td><td><code>string</code></td><td>—</td><td>Background watermark</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Ref Methods</h3>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>getChart()</code></td><td><code>Chart | null</code></td><td>Access the underlying Chart instance</td></tr>
+          <tr><td><code>screenshot(filename?)</code></td><td><code>void</code></td><td>Download chart as PNG</td></tr>
+          <tr><td><code>screenshotDataURL()</code></td><td><code>string | null</code></td><td>Get chart as base64 data URL</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Embeddable Widget -->
+  <section class="doc-section" id="embed">
+    <h2 class="section-title">Embeddable Widget</h2>
+    <p class="section-subtitle">Drop a full chart into any page with a single <code>&lt;iframe&gt;</code>. Configure via URL parameters — no JavaScript required.</p>
+
+    <h3>Usage</h3>
+    <div class="code-block">
+      <div class="code-header"><span>HTML</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre>&lt;<span class="kw">iframe</span>
+  src=<span class="str">"https://bonguynvan.github.io/tradecanvas/embed.html?symbol=BTCUSDT&amp;tf=5m&amp;theme=dark"</span>
+  width=<span class="str">"100%"</span>
+  height=<span class="str">"500"</span>
+  frameborder=<span class="str">"0"</span>
+  allow=<span class="str">"clipboard-write"</span>
+&gt;&lt;/<span class="kw">iframe</span>&gt;</pre>
+      </div>
+    </div>
+
+    <h3>URL Parameters</h3>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>symbol</code></td><td><code>string</code></td><td><code>BTCUSDT</code></td><td>Trading pair</td></tr>
+          <tr><td><code>tf</code></td><td><code>string</code></td><td><code>5m</code></td><td>Timeframe (1m, 5m, 15m, 1h, 4h, 1d)</td></tr>
+          <tr><td><code>theme</code></td><td><code>string</code></td><td><code>dark</code></td><td><code>dark</code> or <code>light</code></td></tr>
+          <tr><td><code>type</code></td><td><code>string</code></td><td><code>candlestick</code></td><td>Chart type (candlestick, line, area, hlc, range)</td></tr>
+          <tr><td><code>indicators</code></td><td><code>string</code></td><td>—</td><td>Comma-separated indicator IDs (e.g. <code>ema,rsi</code>)</td></tr>
+          <tr><td><code>limit</code></td><td><code>number</code></td><td><code>500</code></td><td>Number of historical bars to load</td></tr>
+          <tr><td><code>toolbar</code></td><td><code>string</code></td><td><code>true</code></td><td>Set to <code>false</code> to hide the toolbar</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Examples</h3>
+    <div class="code-block">
+      <div class="code-header"><span>Various configs</span><button class="code-copy-btn" data-copy-block>Copy</button></div>
+      <div class="code-body">
+        <pre><span class="cmt">&lt;!-- Dark BTC chart with EMA + RSI --&gt;</span>
+&lt;<span class="kw">iframe</span> src=<span class="str">".../embed.html?symbol=BTCUSDT&amp;indicators=ema,rsi"</span>&gt;&lt;/<span class="kw">iframe</span>&gt;
+
+<span class="cmt">&lt;!-- Light ETH line chart --&gt;</span>
+&lt;<span class="kw">iframe</span> src=<span class="str">".../embed.html?symbol=ETHUSDT&amp;theme=light&amp;type=line"</span>&gt;&lt;/<span class="kw">iframe</span>&gt;
+
+<span class="cmt">&lt;!-- 4-hour SOL with Bollinger Bands --&gt;</span>
+&lt;<span class="kw">iframe</span> src=<span class="str">".../embed.html?symbol=SOLUSDT&amp;tf=4h&amp;indicators=bb"</span>&gt;&lt;/<span class="kw">iframe</span>&gt;</pre>
+      </div>
+    </div>
+  </section>
+
   <!-- Features Config -->
   <section class="doc-section" id="features">
     <h2 class="section-title">Features Config</h2>
@@ -1744,6 +1916,15 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
             <li><code>chart.addSignalMarker(marker)</code> / <code>setSignalMarkers()</code> / <code>clearSignalMarkers()</code> / <code>setSignalMarkerStyle()</code></li>
             <li><code>chart.addTradeZone(zone)</code> / <code>updateTradeZone()</code> / <code>setTradeZones()</code> / <code>clearTradeZones()</code> / <code>setTradeZoneStyle()</code></li>
             <li>New event types: <code>signalMarkerAdd</code>, <code>signalMarkerRemove</code>, <code>tradeZoneAdd</code>, <code>tradeZoneRemove</code></li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>New packages</h4>
+          <ul>
+            <li><code>@tradecanvas/react</code> — React 18+ wrapper with forwardRef, reactive props, and screenshot helpers</li>
+            <li><code>@tradecanvas/vue</code> — Vue 3 wrapper with template ref, watchers, and emits</li>
+            <li><code>@tradecanvas/svelte</code> — Svelte 5 wrapper with $bindable runes and $effect reactivity</li>
+            <li><strong>Embeddable Widget</strong> — <code>/embed.html</code> for iframe embedding via URL parameters (symbol, timeframe, theme, indicators)</li>
           </ul>
         </div>
       </div>

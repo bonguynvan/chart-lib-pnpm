@@ -8,6 +8,12 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, '../docs'),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        embed: resolve(__dirname, 'embed.html'),
+      },
+    },
   },
   resolve: {
     alias: {

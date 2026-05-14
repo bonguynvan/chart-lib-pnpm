@@ -1,0 +1,52 @@
+{
+  "name": "@tradecanvas/vue",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "description": "Vue 3 component for @tradecanvas/chart — reactive props, template ref, zero boilerplate.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bonguynvan/tradecanvas.git",
+    "directory": "packages/vue"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "trading",
+    "chart",
+    "vue",
+    "vue3",
+    "candlestick",
+    "canvas",
+    "technical-analysis"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@tradecanvas/chart": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": ">=3.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "vue": "^3.5.0"
+  }
+}
