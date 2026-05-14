@@ -38,6 +38,10 @@ export type {
   PriceRangeChangePayload,
   DrawingCreatePayload,
   DrawingRemovePayload,
+  SignalMarkerAddPayload,
+  SignalMarkerRemovePayload,
+  TradeZoneAddPayload,
+  TradeZoneRemovePayload,
   DrawingToolType,
   DrawingState,
   DrawingStyle,
@@ -86,11 +90,18 @@ export type {
   WatermarkConfig,
   GridOptions,
   CrosshairOptions,
+  SignalMarker,
+  SignalDirection,
+  SignalMarkerStyle,
+  TradeZone,
+  TradeZoneDirection,
+  TradeZoneStyle,
 } from '@tradecanvas/commons';
 
 // Re-export themes and defaults
 export {
   DARK_THEME, LIGHT_THEME, DARK_TERMINAL, DEFAULT_DRAWING_STYLE, DEFAULT_TRADING_CONFIG,
+  DEFAULT_SIGNAL_STYLE, DEFAULT_TRADE_ZONE_STYLE,
   TIMEFRAMES_CRYPTO, TIMEFRAMES_STOCK, TIMEFRAMES_FOREX, DEFAULT_TIMEFRAME_FAVORITES,
 } from '@tradecanvas/commons';
 
@@ -126,7 +137,7 @@ export { toHeikinAshi, toRenko, toLineBreak, toKagi, toPointAndFigure, toRangeBa
 export { DataExporter } from '@tradecanvas/core';
 
 // Re-export features
-export { AlertManager, ReplayManager, ChartStateManager, UndoRedoManager } from '@tradecanvas/core';
+export { AlertManager, ReplayManager, ChartStateManager, UndoRedoManager, SignalMarkerManager, TradeZoneManager } from '@tradecanvas/core';
 export type { PriceAlert, AlertCondition, ReplayConfig, ChartSnapshot, UndoableAction } from '@tradecanvas/core';
 
 // Re-export animation
@@ -135,6 +146,10 @@ export type { EasingFn, AnimationOptions } from '@tradecanvas/core';
 
 // Re-export interaction
 export { KeyboardHandler, CrosshairTooltip } from '@tradecanvas/core';
+
+// Multi-chart grid
+export { ChartGrid } from './grid/ChartGrid.js';
+export type { GridLayout, GridCellConfig, ChartGridOptions } from './grid/ChartGrid.js';
 
 // Finance charts
 export { SparklineChart, DepthChart, EquityCurveChart, HeatmapChart, WaterfallChart, GaugeChart } from './finance/index.js';

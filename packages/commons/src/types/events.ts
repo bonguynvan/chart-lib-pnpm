@@ -20,7 +20,11 @@ export type ChartEventType =
   | 'positionClose'
   | 'positionModify'
   | 'drawingCreate'
-  | 'drawingRemove';
+  | 'drawingRemove'
+  | 'signalMarkerAdd'
+  | 'signalMarkerRemove'
+  | 'tradeZoneAdd'
+  | 'tradeZoneRemove';
 
 export interface ChartEvent<T = unknown> {
   type: ChartEventType;
@@ -105,6 +109,25 @@ export interface DrawingRemovePayload {
   id: string;
 }
 
+export interface SignalMarkerAddPayload {
+  id: string;
+  source: string;
+  direction: string;
+}
+
+export interface SignalMarkerRemovePayload {
+  id: string;
+}
+
+export interface TradeZoneAddPayload {
+  id: string;
+  direction: string;
+}
+
+export interface TradeZoneRemovePayload {
+  id: string;
+}
+
 export interface ChartEventMap {
   crosshairMove: CrosshairMovePayload;
   click: { x: number; y: number };
@@ -124,6 +147,10 @@ export interface ChartEventMap {
   positionModify: PositionModifyPayload;
   drawingCreate: DrawingCreatePayload;
   drawingRemove: DrawingRemovePayload;
+  signalMarkerAdd: SignalMarkerAddPayload;
+  signalMarkerRemove: SignalMarkerRemovePayload;
+  tradeZoneAdd: TradeZoneAddPayload;
+  tradeZoneRemove: TradeZoneRemovePayload;
 }
 
 export interface TauriBridgeOptions {

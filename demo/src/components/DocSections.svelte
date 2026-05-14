@@ -98,6 +98,8 @@
     <a class="docs-sidebar-link" href="#indicators">Indicators</a>
     <a class="docs-sidebar-link" href="#drawings">Drawing Tools</a>
     <a class="docs-sidebar-link" href="#trading">Trading Overlay</a>
+    <a class="docs-sidebar-link" href="#signals">Signal Markers</a>
+    <a class="docs-sidebar-link" href="#tradezones">Trade Zones</a>
     <a class="docs-sidebar-link" href="#features">Features Config</a>
     <a class="docs-sidebar-link" href="#mobile">Mobile &amp; Touch</a>
     <a class="docs-sidebar-link" href="#events">Events</a>
@@ -441,7 +443,7 @@ widget.<span class="fn">destroy</span>()</pre>
         <tr><td><code>statusBar</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show bottom status bar</td></tr>
         <tr><td><code>symbols</code></td><td><code>string[]</code></td><td>BTC/ETH/SOL/BNB</td><td>Available symbols</td></tr>
         <tr><td><code>timeframes</code></td><td><code>TimeFrame[]</code></td><td>1m to 1d</td><td>Available timeframes</td></tr>
-        <tr><td><code>chartTypes</code></td><td><code>ChartType[]</code></td><td>7 types</td><td>Available chart types</td></tr>
+        <tr><td><code>chartTypes</code></td><td><code>ChartType[]</code></td><td>11 types</td><td>Available chart types</td></tr>
         <tr><td><code>onSymbolChange</code></td><td><code>(symbol) =&gt; void</code></td><td>--</td><td>Symbol change callback</td></tr>
         <tr><td><code>onTimeframeChange</code></td><td><code>(tf) =&gt; void</code></td><td>--</td><td>Timeframe change callback</td></tr>
         <tr><td><code>onReady</code></td><td><code>(chart) =&gt; void</code></td><td>--</td><td>Fired when chart is ready</td></tr>
@@ -1065,6 +1067,127 @@ chart.<span class="fn">on</span>(<span class="str">'crosshairMove'</span>, (e) =
     </div>
   </section>
 
+  <!-- Signal Markers -->
+  <section class="doc-section" id="signals">
+    <h2 class="section-title">Signal Markers</h2>
+    <p class="section-subtitle">Visualize buy/sell signals from any source — bots, indicators, or manual analysis. Arrow markers render on the chart overlay with confidence-based sizing and source color coding.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>Signal Markers API</span></div>
+      <div class="code-body">
+        <pre><span class="kw">import</span> {'{'} <span class="obj">Chart</span> {'}'} <span class="kw">from</span> <span class="str">'@tradecanvas/chart'</span>
+
+<span class="cmt">// Add a signal marker</span>
+chart.<span class="fn">addSignalMarker</span>({'{'}
+  time: <span class="bool">1715692800000</span>,
+  price: <span class="bool">62500</span>,
+  direction: <span class="str">'long'</span>,
+  confidence: <span class="bool">0.85</span>,
+  source: <span class="str">'ema-crossover'</span>,
+  label: <span class="str">'EMA Cross'</span>,
+{'}'})
+
+<span class="cmt">// Bulk set markers (replaces all)</span>
+chart.<span class="fn">setSignalMarkers</span>(signals)
+
+<span class="cmt">// Customize styling per source</span>
+chart.<span class="fn">setSignalMarkerStyle</span>({'{'}
+  longColor: <span class="str">'#00E676'</span>,
+  shortColor: <span class="str">'#FF5252'</span>,
+  arrowSize: <span class="bool">14</span>,
+  sourceColors: {'{'}
+    <span class="str">'ema-crossover'</span>: <span class="str">'#2196F3'</span>,
+    <span class="str">'rsi-divergence'</span>: <span class="str">'#FF9800'</span>,
+    <span class="str">'whale-flow'</span>: <span class="str">'#9C27B0'</span>,
+  {'}'},
+{'}'})
+
+<span class="cmt">// Listen for events</span>
+chart.<span class="fn">on</span>(<span class="str">'signalMarkerAdd'</span>, (e) =&gt; console.<span class="fn">log</span>(e.payload))
+
+<span class="cmt">// Clean up</span>
+chart.<span class="fn">removeSignalMarker</span>(id)
+chart.<span class="fn">clearSignalMarkers</span>()</pre>
+      </div>
+    </div>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>time</code></td><td><code>number</code></td><td>Bar timestamp (ms)</td></tr>
+          <tr><td><code>price</code></td><td><code>number</code></td><td>Y-axis price level</td></tr>
+          <tr><td><code>direction</code></td><td><code>'long' | 'short' | 'neutral'</code></td><td>Arrow direction</td></tr>
+          <tr><td><code>confidence</code></td><td><code>number</code></td><td>0–1 confidence score (scales arrow size)</td></tr>
+          <tr><td><code>source</code></td><td><code>string</code></td><td>Signal source identifier</td></tr>
+          <tr><td><code>label</code></td><td><code>string?</code></td><td>Optional text below/above marker</td></tr>
+          <tr><td><code>color</code></td><td><code>string?</code></td><td>Override color for this marker</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Trade Zones -->
+  <section class="doc-section" id="tradezones">
+    <h2 class="section-title">Trade Zones</h2>
+    <p class="section-subtitle">Render entry-to-exit rectangles for executed trades — with P&amp;L coloring, direction badges, and exit labels. Supports active (open) and closed trades.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>Trade Zones API</span></div>
+      <div class="code-body">
+        <pre><span class="cmt">// Add a completed trade zone</span>
+chart.<span class="fn">addTradeZone</span>({'{'}
+  entryTime: <span class="bool">1715692800000</span>,
+  entryPrice: <span class="bool">62500</span>,
+  exitTime: <span class="bool">1715700000000</span>,
+  exitPrice: <span class="bool">63200</span>,
+  direction: <span class="str">'long'</span>,
+  pnl: <span class="bool">140</span>,
+  pnlPercent: <span class="bool">1.12</span>,
+  label: <span class="str">'EMA Cross #42'</span>,
+{'}'})
+
+<span class="cmt">// Add an active (open) trade — no exitTime/exitPrice</span>
+<span class="kw">const</span> zoneId = chart.<span class="fn">addTradeZone</span>({'{'}
+  entryTime: <span class="bool">1715710000000</span>,
+  entryPrice: <span class="bool">63100</span>,
+  direction: <span class="str">'short'</span>,
+{'}'})
+
+<span class="cmt">// Update when trade closes</span>
+chart.<span class="fn">updateTradeZone</span>(zoneId, {'{'}
+  exitTime: <span class="bool">1715718000000</span>,
+  exitPrice: <span class="bool">62800</span>,
+  pnl: <span class="bool">60</span>,
+  pnlPercent: <span class="bool">0.48</span>,
+{'}'})
+
+<span class="cmt">// Customize styling</span>
+chart.<span class="fn">setTradeZoneStyle</span>({'{'}
+  profitColor: <span class="str">'#00E676'</span>,
+  lossColor: <span class="str">'#FF5252'</span>,
+  fillOpacity: <span class="bool">0.15</span>,
+{'}'})</pre>
+      </div>
+    </div>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>entryTime</code></td><td><code>number</code></td><td>Entry bar timestamp (ms)</td></tr>
+          <tr><td><code>entryPrice</code></td><td><code>number</code></td><td>Entry price level</td></tr>
+          <tr><td><code>exitTime</code></td><td><code>number?</code></td><td>Exit timestamp (omit for active trades)</td></tr>
+          <tr><td><code>exitPrice</code></td><td><code>number?</code></td><td>Exit price level</td></tr>
+          <tr><td><code>direction</code></td><td><code>'long' | 'short'</code></td><td>Trade direction</td></tr>
+          <tr><td><code>pnl</code></td><td><code>number?</code></td><td>Profit/loss value</td></tr>
+          <tr><td><code>pnlPercent</code></td><td><code>number?</code></td><td>P&amp;L percentage</td></tr>
+          <tr><td><code>label</code></td><td><code>string?</code></td><td>Optional trade label</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <!-- Features Config -->
   <section class="doc-section" id="features">
     <h2 class="section-title">Features Config</h2>
@@ -1516,6 +1639,37 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
       </table>
     </div>
 
+    <h3>Signal Markers</h3>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>addSignalMarker(marker)</code></td><td>Add a signal marker, returns id</td></tr>
+          <tr><td><code>removeSignalMarker(id)</code></td><td>Remove a signal marker</td></tr>
+          <tr><td><code>getSignalMarkers()</code></td><td>Get all signal markers</td></tr>
+          <tr><td><code>setSignalMarkers(markers)</code></td><td>Replace all signal markers</td></tr>
+          <tr><td><code>clearSignalMarkers()</code></td><td>Remove all signal markers</td></tr>
+          <tr><td><code>setSignalMarkerStyle(style)</code></td><td>Customize marker appearance</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Trade Zones</h3>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>addTradeZone(zone)</code></td><td>Add a trade zone, returns id</td></tr>
+          <tr><td><code>updateTradeZone(id, updates)</code></td><td>Update zone (e.g. on trade close)</td></tr>
+          <tr><td><code>removeTradeZone(id)</code></td><td>Remove a trade zone</td></tr>
+          <tr><td><code>getTradeZones()</code></td><td>Get all trade zones</td></tr>
+          <tr><td><code>setTradeZones(zones)</code></td><td>Replace all trade zones</td></tr>
+          <tr><td><code>clearTradeZones()</code></td><td>Remove all trade zones</td></tr>
+          <tr><td><code>setTradeZoneStyle(style)</code></td><td>Customize zone appearance</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <h3>Streaming</h3>
     <div class="doc-table-wrap">
       <table class="doc-table">
@@ -1568,6 +1722,32 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
     <p class="section-subtitle">Release history for @tradecanvas/chart.</p>
 
     <div class="changelog">
+      <div class="changelog-version">
+        <h3>0.7.0 <span class="changelog-date">2026-05-14</span></h3>
+        <div class="changelog-group">
+          <h4>Features</h4>
+          <ul>
+            <li><strong>Multi-Chart Grid</strong> — <code>ChartGrid</code> class for 2/4/6 synchronized charts with linked crosshairs and shared time axis. Supports <code>'1x2'</code>, <code>'2x2'</code>, <code>'2x3'</code> and more layouts</li>
+            <li><strong>4 new chart types</strong> — Volume Candles (width varies by volume), HLC Area (high-low-close band), Step Line (staircase), Line with Markers (dots at data points). Total: 16 chart types</li>
+            <li><strong>Command Palette</strong> — <code>Ctrl+K</code> quick search for indicators, chart types, drawing tools, timeframes, and actions. Built into ChartWidget</li>
+            <li><strong>Visual Price Alerts</strong> — alert lines now render on the chart overlay with bell icon, price label, and triggered/pending color states. Wired into RenderEngine overlay layer</li>
+            <li><strong>Signal Markers API</strong> — <code>chart.addSignalMarker()</code> renders directional arrows on the overlay with confidence-based sizing, per-source color coding, and labels. Designed for bot/signal integrations</li>
+            <li><strong>Trade Zones</strong> — <code>chart.addTradeZone()</code> visualizes entry→exit rectangles with P&amp;L coloring, direction badges, and exit labels. Supports active (open) and closed trades with <code>updateTradeZone()</code></li>
+          </ul>
+        </div>
+        <div class="changelog-group">
+          <h4>API additions</h4>
+          <ul>
+            <li><code>chart.getData()</code> — public access to raw OHLC data series</li>
+            <li><code>chart.setCrosshairPosition(point)</code> — programmatic crosshair placement for chart sync</li>
+            <li><code>ChartGrid.connectAll(adapter, symbols, tf)</code> — bulk connect all grid cells</li>
+            <li><code>chart.addSignalMarker(marker)</code> / <code>setSignalMarkers()</code> / <code>clearSignalMarkers()</code> / <code>setSignalMarkerStyle()</code></li>
+            <li><code>chart.addTradeZone(zone)</code> / <code>updateTradeZone()</code> / <code>setTradeZones()</code> / <code>clearTradeZones()</code> / <code>setTradeZoneStyle()</code></li>
+            <li>New event types: <code>signalMarkerAdd</code>, <code>signalMarkerRemove</code>, <code>tradeZoneAdd</code>, <code>tradeZoneRemove</code></li>
+          </ul>
+        </div>
+      </div>
+
       <div class="changelog-version">
         <h3>0.6.0 <span class="changelog-date">2026-04-28</span></h3>
         <div class="changelog-group">
@@ -1770,7 +1950,7 @@ gauge.<span class="fn">setValue</span>(<span class="bool">85</span>)</pre>
         <div class="changelog-group">
           <h4>Initial Release</h4>
           <ul>
-            <li>11 chart types (Candlestick, Line, Area, Heikin-Ashi, Renko, Kagi, ...)</li>
+            <li>16 chart types (Candlestick, Line, Area, Heikin-Ashi, Renko, Kagi, Volume Candles, HLC Area, Step Line, ...)</li>
             <li>26 built-in indicators (SMA, EMA, RSI, MACD, Bollinger, Ichimoku, ...)</li>
             <li>23 drawing tools with magnet snapping and undo/redo</li>
             <li>Trading overlay with positions, orders, drag-to-modify SL/TP</li>

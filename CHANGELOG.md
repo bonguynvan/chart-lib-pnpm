@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.7.0 (2026-05-14)
+
+### Features
+
+- **Multi-Chart Grid** — new `ChartGrid` class for 2/4/6 synchronized charts with linked crosshairs and shared time axis. Layouts: `'1x2'`, `'2x2'`, `'2x3'` and more. `connectAll()` for bulk data source binding
+- **4 new chart types** — Volume Candles (width proportional to volume), HLC Area (high-low-close band), Step Line (staircase pattern), Line with Markers (dots at data points). Total: 16 chart types
+- **Command Palette** — `Ctrl+K` / `Cmd+K` quick search inside ChartWidget for indicators, chart types, drawing tools, timeframes, and actions (screenshot, theme toggle, settings). Keyboard navigation with arrow keys and Enter
+- **Visual Price Alerts** — `AlertManager.render()` now wired into the overlay layer. Alert lines show bell icon, price label, and triggered/pending color states on the live chart
+- **Signal Markers API** — `chart.addSignalMarker()` renders directional arrows on the overlay with confidence-based sizing, per-source color coding, and labels. Designed for bot/signal trading integrations
+- **Trade Zones** — `chart.addTradeZone()` visualizes entry→exit rectangles with P&L coloring, direction badges, and exit labels. Supports active (open) and closed trades with `updateTradeZone()`
+
+### API additions
+
+- `chart.getData()` — public access to raw OHLC data series
+- `chart.setCrosshairPosition(point)` — programmatic crosshair placement for cross-chart sync
+- `ChartGrid.connectAll(adapter, symbols, timeframe)` — bulk connect all grid cells to live data
+- `ChartGrid.setLayout(layout)` — dynamically switch grid layout, adding/removing charts as needed
+- `chart.addSignalMarker(marker)` / `setSignalMarkers()` / `clearSignalMarkers()` / `setSignalMarkerStyle()`
+- `chart.addTradeZone(zone)` / `updateTradeZone()` / `setTradeZones()` / `clearTradeZones()` / `setTradeZoneStyle()`
+- New event types: `signalMarkerAdd`, `signalMarkerRemove`, `tradeZoneAdd`, `tradeZoneRemove`
+- New types: `SignalMarker`, `SignalDirection`, `SignalMarkerStyle`, `TradeZone`, `TradeZoneDirection`, `TradeZoneStyle`
+
 ## 0.6.0 (2026-04-28)
 
 ### Features

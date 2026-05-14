@@ -22,6 +22,10 @@ export const CHART_TYPES: { label: string; value: ChartType }[] = [
   { label: 'Line Break', value: 'lineBreak' },
   { label: 'Point & Figure', value: 'pointAndFigure' },
   { label: 'Range Bars', value: 'rangeBars' },
+  { label: 'Volume Candles', value: 'volumeCandles' },
+  { label: 'HLC Area', value: 'hlcArea' },
+  { label: 'Step Line', value: 'stepLine' },
+  { label: 'Line + Markers', value: 'lineWithMarkers' },
 ];
 
 export interface DrawingToolGroupDef {

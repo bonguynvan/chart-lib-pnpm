@@ -85,7 +85,7 @@ function validateDrawing(raw: unknown): DrawingState | null {
     id: raw.id,
     type: raw.type as DrawingState['type'],
     anchors,
-    style: style as DrawingState['style'],
+    style: style as unknown as DrawingState['style'],
     visible: typeof raw.visible === 'boolean' ? raw.visible : true,
     locked: typeof raw.locked === 'boolean' ? raw.locked : false,
     meta: isObject(raw.meta) ? raw.meta : undefined,

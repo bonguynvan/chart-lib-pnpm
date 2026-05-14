@@ -8,6 +8,8 @@ import { WidgetToolbar } from './WidgetToolbar.js';
 import { WidgetDrawingSidebar } from './WidgetDrawingSidebar.js';
 import { WidgetSettings } from './WidgetSettings.js';
 import { WidgetStatusBar } from './WidgetStatusBar.js';
+import { WidgetCommandPalette } from './WidgetCommandPalette.js';
+import type { CommandItem } from './WidgetCommandPalette.js';
 
 export class ChartWidget {
   private chart: Chart;
@@ -16,6 +18,7 @@ export class ChartWidget {
   private sidebar: WidgetDrawingSidebar | null = null;
   private settings: WidgetSettings | null = null;
   private statusBar: WidgetStatusBar | null = null;
+  private commandPalette: WidgetCommandPalette | null = null;
   private root: HTMLDivElement;
   private chartContainer: HTMLDivElement;
   private destroyed = false;
@@ -24,6 +27,7 @@ export class ChartWidget {
   private symbols: string[];
   private settingsState: ChartSettingsState;
   private adapter: import('@tradecanvas/commons').DataAdapter | null = null;
+  private boundGlobalKeydown: ((e: KeyboardEvent) => void) | null = null;
 
   constructor(container: HTMLElement, options: ChartWidgetOptions = {}) {
     this.options = options;
@@ -156,7 +160,25 @@ export class ChartWidget {
       });
     }
 
-    // 8. Connect stream
+    // 8. Command palette
+    this.commandPalette = new WidgetCommandPalette({
+      onIndicator: (id) => this.handleAddIndicator(id),
+      onChartType: (type) => this.handleChartType(type),
+      onDrawingTool: (tool) => this.handleDrawingTool(tool),
+      onTimeframe: (tf) => this.handleTimeframe(tf),
+      onAction: (id) => this.handleAction(id),
+      onClose: () => {},
+    });
+
+    this.boundGlobalKeydown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        this.toggleCommandPalette();
+      }
+    };
+    document.addEventListener('keydown', this.boundGlobalKeydown);
+
+    // 9. Connect stream
     if (options.adapter) {
       this.adapter = options.adapter;
       this.connectStream();
@@ -208,6 +230,10 @@ export class ChartWidget {
     if (this.destroyed) return;
     this.destroyed = true;
 
+    if (this.boundGlobalKeydown) {
+      document.removeEventListener('keydown', this.boundGlobalKeydown);
+    }
+    this.commandPalette?.destroy();
     this.toolbar?.destroy();
     this.sidebar?.destroy();
     this.settings?.destroy();
@@ -275,6 +301,84 @@ export class ChartWidget {
     }
     this.state = { ...this.state, activeIndicators: next };
     this.updateUI();
+  }
+
+  private toggleCommandPalette(): void {
+    if (this.commandPalette?.isOpen()) {
+      this.commandPalette.close();
+      return;
+    }
+    this.commandPalette?.open(this.buildCommandItems());
+  }
+
+  private buildCommandItems(): CommandItem[] {
+    const items: CommandItem[] = [];
+
+    for (const ind of INDICATORS) {
+      items.push({
+        id: ind.id,
+        label: ind.name,
+        category: 'indicator',
+        active: this.state.activeIndicators.has(ind.id),
+      });
+    }
+
+    for (const ct of CHART_TYPES) {
+      items.push({
+        id: ct.value,
+        label: ct.label,
+        category: 'chartType',
+        active: this.state.chartType === ct.value,
+      });
+    }
+
+    for (const group of DRAWING_TOOL_GROUPS) {
+      for (const tool of group.tools) {
+        items.push({
+          id: tool.value,
+          label: tool.label,
+          category: 'drawing',
+          active: this.state.activeTool === tool.value,
+        });
+      }
+    }
+
+    for (const tf of TIMEFRAMES) {
+      items.push({
+        id: tf.value,
+        label: tf.label,
+        category: 'timeframe',
+        active: this.state.timeframe === tf.value,
+      });
+    }
+
+    items.push(
+      { id: 'screenshot', label: 'Screenshot', category: 'action', shortcut: '' },
+      { id: 'toggleTheme', label: 'Toggle Theme', category: 'action' },
+      { id: 'settings', label: 'Settings', category: 'action' },
+      { id: 'clearDrawings', label: 'Clear All Drawings', category: 'action' },
+    );
+
+    return items;
+  }
+
+  private handleAction(id: string): void {
+    switch (id) {
+      case 'screenshot':
+        this.chart.screenshot();
+        break;
+      case 'toggleTheme':
+        this.handleToggleTheme();
+        break;
+      case 'settings':
+        this.openSettings();
+        break;
+      case 'clearDrawings':
+        this.chart.clearDrawings();
+        this.state = { ...this.state, activeTool: null };
+        this.updateUI();
+        break;
+    }
   }
 
   private handleDrawingTool(tool: DrawingToolType): void {

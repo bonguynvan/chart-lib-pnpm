@@ -6,7 +6,8 @@ export type ChartType =
   | 'candlestick' | 'line' | 'area' | 'bar'
   | 'heikinAshi' | 'hollowCandle' | 'baseline'
   | 'renko' | 'lineBreak' | 'kagi' | 'pointAndFigure'
-  | 'rangeBars';
+  | 'rangeBars'
+  | 'volumeCandles' | 'hlcArea' | 'stepLine' | 'lineWithMarkers';
 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 

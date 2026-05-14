@@ -52,7 +52,7 @@ const widget = new ChartWidget(document.getElementById('chart')!, {
 <!-- Hero -->
 <section class="hero">
   <h1 class="hero-title">TradeCanvas</h1>
-  <p class="hero-subtitle">High-performance canvas trading chart with a built-in TradingView-like UI. 33 indicators, 23 drawing tools, 12 chart types, live streaming, mobile-ready. Zero dependencies.</p>
+  <p class="hero-subtitle">High-performance canvas trading chart with a built-in TradingView-like UI. 33 indicators, 23 drawing tools, 16 chart types, multi-chart grid, command palette, signal markers, trade zones, live streaming, mobile-ready. Zero dependencies.</p>
 
   <div class="cta-row">
     <div class="cta-install-wrap">
@@ -82,9 +82,11 @@ const widget = new ChartWidget(document.getElementById('chart')!, {
   <div class="badge-row">
     <span class="badge"><span class="badge-dot"></span> 33 Indicators</span>
     <span class="badge"><span class="badge-dot badge-dot--green"></span> 23 Drawing Tools</span>
-    <span class="badge"><span class="badge-dot"></span> 12 Chart Types</span>
+    <span class="badge"><span class="badge-dot"></span> 16 Chart Types</span>
+    <span class="badge"><span class="badge-dot badge-dot--red"></span> Signal Markers &amp; Trade Zones</span>
     <span class="badge"><span class="badge-dot badge-dot--red"></span> Real-Time Streaming</span>
-    <span class="badge"><span class="badge-dot"></span> Web Worker Pipeline</span>
+    <span class="badge"><span class="badge-dot badge-dot--green"></span> Multi-Chart Grid</span>
+    <span class="badge"><span class="badge-dot"></span> Command Palette</span>
     <span class="badge"><span class="badge-dot badge-dot--green"></span> Mobile &amp; Touch Ready</span>
     <span class="badge"><span class="badge-dot"></span> Zero Dependencies</span>
   </div>
@@ -93,8 +95,8 @@ const widget = new ChartWidget(document.getElementById('chart')!, {
 <!-- Widget Announcement -->
 <section class="widget-section">
   <div class="widget-callout">
-    <h3>v0.6 — ChartWidget powers this page</h3>
-    <p>The chart below is a single <code>new ChartWidget(host, &#123;...&#125;)</code> call — toolbar, drawing sidebar, settings, and status bar all built in. Resize the window to see the responsive layout adapt under 768px.</p>
+    <h3>v0.7 — Multi-Chart Grid, Command Palette &amp; 16 Chart Types</h3>
+    <p>New in 0.7: <code>ChartGrid</code> for synchronized multi-chart layouts, <code>Ctrl+K</code> command palette, 4 new chart types (Volume Candles, HLC Area, Step Line, Line+Markers), and visual price alerts on the overlay. The chart below is a single <code>new ChartWidget(host, &#123;...&#125;)</code> call — try <kbd>Ctrl+K</kbd> to search.</p>
     <code>import {'{'} ChartWidget {'}'} from '@tradecanvas/chart/widget'</code>
     <a href="#widget">See documentation</a>
   </div>
@@ -124,8 +126,8 @@ const widget = new ChartWidget(document.getElementById('chart')!, {
     </div>
     <div class="feature-card">
       <div class="feature-icon">[/]</div>
-      <h3>12 Chart Types</h3>
-      <p>Candlestick, OHLC bars, line, area, mountain, baseline, hollow candles, Heikin-Ashi, Renko, Kagi, Line Break, Point &amp; Figure, and Range Bars. Switch at runtime with <code>chart.setChartType()</code>.</p>
+      <h3>16 Chart Types</h3>
+      <p>Candlestick, OHLC bars, line, area, baseline, hollow candles, Heikin-Ashi, Renko, Kagi, Line Break, Point &amp; Figure, Range Bars, Volume Candles, HLC Area, Step Line, and Line+Markers. Switch at runtime with <code>chart.setChartType()</code>.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon feature-icon--green">▦</div>

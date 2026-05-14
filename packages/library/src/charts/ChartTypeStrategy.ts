@@ -4,11 +4,15 @@ import {
   BarRenderer,
   BaselineRenderer,
   CandlestickRenderer,
+  HLCAreaRenderer,
   HollowCandleRenderer,
   KagiRenderer,
   LineRenderer,
+  LineWithMarkersRenderer,
   PointAndFigureRenderer,
   RenkoRenderer,
+  StepLineRenderer,
+  VolumeCandleRenderer,
   toHeikinAshi,
   toKagi,
   toLineBreak,
@@ -46,6 +50,14 @@ export function createRendererFor(type: ChartType): ChartRendererInterface {
       return new KagiRenderer();
     case 'pointAndFigure':
       return new PointAndFigureRenderer();
+    case 'volumeCandles':
+      return new VolumeCandleRenderer();
+    case 'hlcArea':
+      return new HLCAreaRenderer();
+    case 'stepLine':
+      return new StepLineRenderer();
+    case 'lineWithMarkers':
+      return new LineWithMarkersRenderer();
     default:
       return new CandlestickRenderer();
   }

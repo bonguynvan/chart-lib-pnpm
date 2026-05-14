@@ -21,6 +21,9 @@ import type { BarCountdown } from '../ui/BarCountdown.js';
 import type { SessionBreaks } from '../ui/SessionBreaks.js';
 import type { VolumeRenderer } from '../charts/VolumeRenderer.js';
 import type { CompareRenderer } from '../charts/CompareRenderer.js';
+import type { AlertManager } from '../features/AlertManager.js';
+import type { SignalMarkerManager } from '../features/SignalMarkerManager.js';
+import type { TradeZoneManager } from '../features/TradeZoneManager.js';
 
 export interface PanelRenderInfo {
   instanceId: string;
@@ -44,6 +47,9 @@ export interface RenderContext {
   barCountdown: BarCountdown | null;
   sessionBreaks: SessionBreaks | null;
   compareRenderer: CompareRenderer | null;
+  alertManager: AlertManager | null;
+  signalMarkerManager: SignalMarkerManager | null;
+  tradeZoneManager: TradeZoneManager | null;
   panels: PanelRenderInfo[];
   priceLimits?: { ceiling: number; floor: number; reference: number; colors?: { ceiling?: string; floor?: string; reference?: string } } | null;
   timeAxisY?: number;
@@ -224,8 +230,11 @@ export class RenderEngine {
         this.renderPriceLimits(c, viewport, theme, ctx.priceLimits);
       }
 
+      ctx.tradeZoneManager?.render(c, viewport, theme);
       ctx.drawingRenderer?.render(c, viewport);
       ctx.tradingRenderer?.render(c, viewport, theme);
+      ctx.signalMarkerManager?.render(c, viewport, theme);
+      ctx.alertManager?.render(c, viewport, theme);
       ctx.crosshairHandler?.render(c, viewport, theme);
 
       // Panel crosshair — draw crosshair lines in the hovered panel

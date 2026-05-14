@@ -55,6 +55,8 @@ import {
   BarCountdown,
   VolumeRenderer,
   AlertManager,
+  SignalMarkerManager,
+  TradeZoneManager,
   ReplayManager,
   ChartStateManager,
   UndoRedoManager,
@@ -77,7 +79,7 @@ import { LayoutManager } from './layout/LayoutManager.js';
 import { PluginManager } from './plugins/PluginManager.js';
 
 export class Chart {
-  static version = '0.3.0';
+  static version = '0.7.0';
 
   private engine: RenderEngine;
   private viewport: Viewport;
@@ -107,6 +109,8 @@ export class Chart {
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
   private volumeRenderer: VolumeRenderer;
   private alertManager: AlertManager;
+  private signalMarkerManager: SignalMarkerManager;
+  private tradeZoneManager: TradeZoneManager;
   private replayManager: ReplayManager;
   private undoRedoManager: UndoRedoManager;
   private autoSaveScheduler = new AutoSaveScheduler((key) => this.saveState(key));
@@ -371,6 +375,28 @@ export class Chart {
     this.alertManager.setRequestRender(() => this.engine.requestRender(LayerType.Overlay));
     this.alertManager.on('triggered', (alert) => {
       this.eventBus.emit('dataUpdate', { alert: 'triggered', alertId: alert.id, price: alert.price, message: alert.message });
+    });
+
+    // Signal markers
+    this.signalMarkerManager = new SignalMarkerManager();
+    this.signalMarkerManager.setRequestRender(() => this.engine.requestRender(LayerType.Overlay));
+    this.signalMarkerManager.setDataGetter(() => this.dataManager.getData());
+    this.signalMarkerManager.on('added', (m) => {
+      this.eventBus.emit('signalMarkerAdd' as ChartEventType, { id: m.id, source: m.source, direction: m.direction });
+    });
+    this.signalMarkerManager.on('removed', (id) => {
+      this.eventBus.emit('signalMarkerRemove' as ChartEventType, { id });
+    });
+
+    // Trade zones
+    this.tradeZoneManager = new TradeZoneManager();
+    this.tradeZoneManager.setRequestRender(() => this.engine.requestRender(LayerType.Overlay));
+    this.tradeZoneManager.setDataGetter(() => this.dataManager.getData());
+    this.tradeZoneManager.on('added', (z) => {
+      this.eventBus.emit('tradeZoneAdd' as ChartEventType, { id: z.id, direction: z.direction });
+    });
+    this.tradeZoneManager.on('removed', (id) => {
+      this.eventBus.emit('tradeZoneRemove' as ChartEventType, { id });
     });
 
     // Replay
@@ -1045,6 +1071,17 @@ export class Chart {
     return this.crosshairHandler.getMode();
   }
 
+  setCrosshairPosition(point: { x: number; y: number } | null): void {
+    if (point) {
+      this.crosshairHandler.onPointerMove(point);
+    }
+    this.engine.requestRender(LayerType.Overlay);
+  }
+
+  getData(): DataSeries {
+    return this.dataManager.getData();
+  }
+
   // --- Grid ---
 
   setGridVisible(visible: boolean): void {
@@ -1137,6 +1174,62 @@ export class Chart {
   loadAlerts(key: string): void {
     this.alertManager.loadFromStorage(key);
     this.engine.requestRender(LayerType.Overlay);
+  }
+
+  // --- Signal Markers ---
+
+  addSignalMarker(marker: Omit<import('@tradecanvas/commons').SignalMarker, 'id'> & { id?: string }): string {
+    return this.signalMarkerManager.addMarker(marker);
+  }
+
+  removeSignalMarker(id: string): void {
+    this.signalMarkerManager.removeMarker(id);
+  }
+
+  getSignalMarkers(): import('@tradecanvas/commons').SignalMarker[] {
+    return this.signalMarkerManager.getMarkers();
+  }
+
+  setSignalMarkers(markers: import('@tradecanvas/commons').SignalMarker[]): void {
+    this.signalMarkerManager.setMarkers(markers);
+  }
+
+  clearSignalMarkers(): void {
+    this.signalMarkerManager.clearMarkers();
+  }
+
+  setSignalMarkerStyle(style: Partial<import('@tradecanvas/commons').SignalMarkerStyle>): void {
+    this.signalMarkerManager.setStyle(style);
+  }
+
+  // --- Trade Zones ---
+
+  addTradeZone(zone: Omit<import('@tradecanvas/commons').TradeZone, 'id'> & { id?: string }): string {
+    return this.tradeZoneManager.addZone(zone);
+  }
+
+  updateTradeZone(id: string, updates: Partial<Omit<import('@tradecanvas/commons').TradeZone, 'id'>>): void {
+    this.tradeZoneManager.updateZone(id, updates);
+  }
+
+  removeTradeZone(id: string): void {
+    this.tradeZoneManager.removeZone(id);
+  }
+
+  getTradeZones(): import('@tradecanvas/commons').TradeZone[] {
+    return this.tradeZoneManager.getZones();
+  }
+
+  setTradeZones(zones: import('@tradecanvas/commons').TradeZone[]): void {
+    this.tradeZoneManager.setZones(zones);
+  }
+
+  clearTradeZones(): void {
+    this.tradeZoneManager.clearZones();
+  }
+
+  setTradeZoneStyle(style: Partial<import('@tradecanvas/commons').TradeZoneStyle>): void {
+    this.tradeZoneManager.setStyle(style);
   }
 
   // --- Replay ---
@@ -1510,6 +1603,9 @@ export class Chart {
       barCountdown: this.barCountdown,
       sessionBreaks: this.sessionBreaks,
       compareRenderer: this.compareRenderer,
+      alertManager: this.features.alerts ? this.alertManager : null,
+      signalMarkerManager: this.signalMarkerManager,
+      tradeZoneManager: this.tradeZoneManager,
       panels,
       priceLimits: this.buildPriceLimits(),
       timeAxisY,

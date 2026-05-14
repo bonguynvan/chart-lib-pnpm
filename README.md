@@ -88,7 +88,7 @@ That's it. Full toolbar, drawing sidebar, settings modal, and status bar — all
 | `statusBar` | `boolean` | `true` | Show bottom status bar |
 | `symbols` | `string[]` | BTC/ETH/SOL/BNB | Available symbols |
 | `timeframes` | `TimeFrame[]` | 1m to 1d | Available timeframes |
-| `chartTypes` | `ChartType[]` | 7 types | Available chart types |
+| `chartTypes` | `ChartType[]` | 11 types | Available chart types |
 | `onSymbolChange` | `(symbol) => void` | — | Symbol change callback |
 | `onTimeframeChange` | `(tf) => void` | — | Timeframe change callback |
 | `onReady` | `(chart) => void` | — | Fired when chart is ready |
@@ -122,6 +122,33 @@ That's it. Full toolbar, drawing sidebar, settings modal, and status bar — all
 | Point & Figure | X/O columns for supply/demand analysis |
 | Line Break | Three-line break charts |
 | Range Bars | Fixed price-range bars — each bar's high − low equals a configured range |
+| Volume Candles | Candlesticks with width proportional to volume |
+| HLC Area | High-low-close area band with close line |
+| Step Line | Staircase/step pattern from close prices |
+| Line with Markers | Close line with circular markers at each data point |
+
+### Multi-Chart Grid
+
+Display multiple synchronized charts side-by-side with linked crosshairs and time axis:
+
+```typescript
+import { ChartGrid, BinanceAdapter } from '@tradecanvas/chart'
+
+const grid = new ChartGrid(document.getElementById('grid')!, {
+  layout: '2x2',
+  syncCrosshair: true,
+  syncTimeAxis: true,
+})
+
+const adapter = new BinanceAdapter()
+grid.connectAll(adapter, ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'], '5m')
+```
+
+Supported layouts: `'1x1'`, `'1x2'`, `'2x1'`, `'2x2'`, `'1x3'`, `'3x1'`, `'2x3'`, `'3x2'`.
+
+### Command Palette
+
+Press `Ctrl+K` (or `Cmd+K`) inside ChartWidget to open a searchable command palette. Quickly find and toggle indicators, change chart types, activate drawing tools, switch timeframes, or trigger actions (screenshot, theme toggle, settings).
 
 ### Finance Charts
 
@@ -235,6 +262,53 @@ chart.setTradingConfig({
 // Listen for user drag-to-modify
 chart.on('positionModify', (e) => console.log('SL/TP moved:', e.payload))
 chart.on('orderModify', (e) => console.log('Order moved:', e.payload))
+```
+
+### Signal Markers
+
+Visualize buy/sell signals from bots, indicators, or manual analysis.
+
+```typescript
+chart.addSignalMarker({
+  time: 1715692800000,
+  price: 62500,
+  direction: 'long',
+  confidence: 0.85,
+  source: 'ema-crossover',
+  label: 'EMA Cross',
+})
+
+// Color-code by source
+chart.setSignalMarkerStyle({
+  sourceColors: {
+    'ema-crossover': '#2196F3',
+    'rsi-divergence': '#FF9800',
+    'whale-flow': '#9C27B0',
+  },
+})
+```
+
+### Trade Zones
+
+Render entry→exit rectangles with P&L coloring for executed trades.
+
+```typescript
+const zoneId = chart.addTradeZone({
+  entryTime: 1715692800000,
+  entryPrice: 62500,
+  exitTime: 1715700000000,
+  exitPrice: 63200,
+  direction: 'long',
+  pnl: 140,
+  pnlPercent: 1.12,
+})
+
+// Update a live trade when it closes
+chart.updateTradeZone(zoneId, {
+  exitTime: Date.now(),
+  exitPrice: 63500,
+  pnl: 200,
+})
 ```
 
 ### Real-Time Streaming

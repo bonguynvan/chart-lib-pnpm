@@ -88,7 +88,7 @@ That's it. Full toolbar, drawing sidebar, settings modal, and status bar — all
 | `statusBar` | `boolean` | `true` | Show bottom status bar |
 | `symbols` | `string[]` | BTC/ETH/SOL/BNB | Available symbols |
 | `timeframes` | `TimeFrame[]` | 1m to 1d | Available timeframes |
-| `chartTypes` | `ChartType[]` | 7 types | Available chart types |
+| `chartTypes` | `ChartType[]` | 11 types | Available chart types |
 | `onSymbolChange` | `(symbol) => void` | — | Symbol change callback |
 | `onTimeframeChange` | `(tf) => void` | — | Timeframe change callback |
 | `onReady` | `(chart) => void` | — | Fired when chart is ready |
@@ -122,6 +122,31 @@ That's it. Full toolbar, drawing sidebar, settings modal, and status bar — all
 | Point & Figure | X/O columns for supply/demand analysis |
 | Line Break | Three-line break charts |
 | Range Bars | Fixed price-range bars — each bar's high − low equals a configured range |
+| Volume Candles | Candlesticks with width proportional to volume |
+| HLC Area | High-low-close area band with close line |
+| Step Line | Staircase/step pattern from close prices |
+| Line with Markers | Close line with circular markers at each data point |
+
+### Multi-Chart Grid
+
+```typescript
+import { ChartGrid, BinanceAdapter } from '@tradecanvas/chart'
+
+const grid = new ChartGrid(document.getElementById('grid')!, {
+  layout: '2x2',
+  syncCrosshair: true,
+  syncTimeAxis: true,
+})
+
+const adapter = new BinanceAdapter()
+grid.connectAll(adapter, ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'], '5m')
+```
+
+Layouts: `'1x1'`, `'1x2'`, `'2x1'`, `'2x2'`, `'1x3'`, `'3x1'`, `'2x3'`, `'3x2'`.
+
+### Command Palette
+
+Press `Ctrl+K` / `Cmd+K` inside ChartWidget to open the command palette. Search indicators, chart types, drawing tools, timeframes, and actions.
 
 ### Finance Charts
 
